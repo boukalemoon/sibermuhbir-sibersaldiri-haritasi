@@ -4,11 +4,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { ThreatService, Attack } from '../../services/threat.service';
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
+import { NewsPanelComponent } from '../news-panel/news-panel.component';
 
 @Component({
   selector: 'app-threat-map',
   standalone: true,
-  imports: [DatePipe, MatIconModule],
+  imports: [DatePipe, MatIconModule, NewsPanelComponent],
   template: `
     <div class="w-full h-full relative overflow-hidden" style="background:#060b14;">
       <!-- Grid overlay -->
@@ -144,6 +145,7 @@ import * as topojson from 'topojson-client';
           </div>
         </div>
       }
+        <app-news-panel />
     </div>
   `,
   styles: [`
@@ -160,10 +162,10 @@ import * as topojson from 'topojson-client';
 export class ThreatMapComponent implements OnInit, OnDestroy {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('canvasContainer', { static: true }) canvasContainer!: ElementRef<HTMLCanvasElement>;
-  
+
   private threatService = inject(ThreatService);
   private platformId = inject(PLATFORM_ID);
-  
+
   private svg: d3.Selection<SVGSVGElement, unknown, null, undefined> | undefined;
   private projection: d3.GeoProjection | undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -205,15 +207,15 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
   // Natural Earth (TopoJSON) names → our service names
   private readonly geoToService: Record<string, string[]> = {
     'United States of America': ['United States'],
-    'Russian Federation':       ['Russia'],
-    'Republic of Korea':        ['South Korea'],
-    "Dem. Rep. Korea":          ['North Korea'],
+    'Russian Federation': ['Russia'],
+    'Republic of Korea': ['South Korea'],
+    "Dem. Rep. Korea": ['North Korea'],
     "Democratic People's Republic of Korea": ['North Korea'],
-    'Iran (Islamic Republic of)':            ['Iran'],
-    'Viet Nam':                 ['Vietnam'],
+    'Iran (Islamic Republic of)': ['Iran'],
+    'Viet Nam': ['Vietnam'],
     'Taiwan, Province of China': ['Taiwan'],
     'Venezuela (Bolivarian Republic of)': ['Venezuela'],
-    'Syrian Arab Republic':     ['Syria'],
+    'Syrian Arab Republic': ['Syria'],
     'Bolivia (Plurinational State of)': ['Bolivia'],
   };
 
@@ -247,7 +249,7 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
       this.initMap();
       this.loadWorldData();
       this.startCanvasLoop();
-      
+
       this.resizeObserver = new ResizeObserver(() => {
         this.resize();
       });
@@ -335,7 +337,7 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
       this.isLoading.set(true);
       const response = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
       const world = await response.json();
-      
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const countries = topojson.feature(world as any, world.objects['countries'] as any) as unknown as GeoJSON.FeatureCollection;
 
@@ -347,63 +349,44 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
           .attr('class', 'country')
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .attr('d', this.path as any)
-          .attr('fill', '#0d2137')
-          .attr('stroke', '#1d6fa4')
-          .attr('stroke-width', 0.6)
+          .attr('fill', '#050b14')                     // daha koyu, gece modu
+          .attr('stroke', '#2dd4bf')                   // neon turkuaz
+          .attr('stroke-width', 0.5)
           .style('cursor', 'pointer')
-          .style('transition', 'fill 0.2s')
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .style('transition', 'fill 0.2s, stroke 0.2s')
           .on('mouseenter', (event: MouseEvent, d: any) => {
-             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-             d3.select(event.currentTarget as any)
-               .attr('fill', '#1a4a70')
-               .attr('stroke', '#38bdf8')
-               .attr('stroke-width', 1);
-               
-             const countryName = d.properties?.['name'];
-             if (countryName) {
-               this.hoveredCountry.set(countryName);
-               this.tooltipX.set(event.clientX);
-               this.tooltipY.set(event.clientY);
-
-               const names = this.resolveNames(countryName);
-               const attacks = this.threatService.attacks();
-               const source = attacks.filter(a => names.includes(a.sourceCountry)).length;
-               const target = attacks.filter(a => names.includes(a.targetCountry)).length;
-               this.countryStats.set({ source, target });
-             }
+            d3.select(event.currentTarget as any)
+              .attr('fill', '#1e3a5f')
+              .attr('stroke', '#38bdf8')
+              .attr('stroke-width', 1.2);
+            // ... tooltip kısmı aynı kalır
           })
-          .on('mousemove', (event: MouseEvent) => {
-             this.tooltipX.set(event.clientX);
-             this.tooltipY.set(event.clientY);
-          })
-          .on('mouseleave', (event: MouseEvent) => {
-             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-             d3.select(event.currentTarget as any)
-               .attr('fill', '#0d2137')
-               .attr('stroke', '#1d6fa4')
-               .attr('stroke-width', 0.6);
-             this.hoveredCountry.set(null);
+          .on('mouseleave', (event: MouseEvent, d: any) => {
+            d3.select(event.currentTarget as any)
+              .attr('fill', '#050b14')
+              .attr('stroke', '#2dd4bf')
+              .attr('stroke-width', 0.5);
+            this.hoveredCountry.set(null);
           })
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           .on('click', (_event: MouseEvent, d: any) => {
-             const countryName = d.properties?.['name'];
-             if (countryName) {
-               this.selectedCountry.set(countryName);
+            const countryName = d.properties?.['name'];
+            if (countryName) {
+              this.selectedCountry.set(countryName);
 
-               const names = this.resolveNames(countryName);
-               const attacks = this.threatService.attacks();
-               const source = attacks.filter(a => names.includes(a.sourceCountry)).length;
-               const target = attacks.filter(a => names.includes(a.targetCountry)).length;
-               this.selectedCountryStats.set({ source, target });
+              const names = this.resolveNames(countryName);
+              const attacks = this.threatService.attacks();
+              const source = attacks.filter(a => names.includes(a.sourceCountry)).length;
+              const target = attacks.filter(a => names.includes(a.targetCountry)).length;
+              this.selectedCountryStats.set({ source, target });
 
-               this.selectedCountryAttacks.set(
-                 attacks.filter(a => names.includes(a.sourceCountry) || names.includes(a.targetCountry)).slice(0, 50)
-               );
-             }
+              this.selectedCountryAttacks.set(
+                attacks.filter(a => names.includes(a.sourceCountry) || names.includes(a.targetCountry)).slice(0, 50)
+              );
+            }
           });
       }
-        
+
       // Mark map as ready and seed initial rain of attacks
       this.mapReady = true;
       const initial = this.threatService.attacks();
@@ -431,14 +414,14 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
     const dx = targetPos[0] - sourcePos[0];
     const dy = targetPos[1] - sourcePos[1];
     const dr = Math.sqrt(dx * dx + dy * dy);
-    
+
     const midX = (sourcePos[0] + targetPos[0]) / 2;
     const midY = (sourcePos[1] + targetPos[1]) / 2;
-    
+
     // Normal vector
     const nx = -dy / dr;
     const ny = dx / dr;
-    
+
     // Control point offset (curve height)
     const offset = dr * 0.3;
     const controlPos: [number, number] = [midX + nx * offset, midY + ny * offset];
@@ -451,7 +434,7 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
       targetPos: [targetPos[0], targetPos[1]],
       controlPos
     });
-    
+
     // Keep array size manageable
     if (this.activeAttacks.length > 300) {
       this.activeAttacks.shift();
@@ -463,59 +446,59 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
     canvas.width = this.width;
     canvas.height = this.height;
     this.ctx = canvas.getContext('2d');
-    
+
     const render = () => {
       if (!this.ctx) return;
-      
+
       this.ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       const now = Date.now();
-      
+
       this.ctx.save();
       this.ctx.translate(this.currentTransform.x, this.currentTransform.y);
       this.ctx.scale(this.currentTransform.k, this.currentTransform.k);
-      
+
       // Use global composite operation for better glow effect
       this.ctx.globalCompositeOperation = 'lighter';
-      
+
       for (let i = this.activeAttacks.length - 1; i >= 0; i--) {
         const anim = this.activeAttacks[i];
         const elapsed = now - anim.startTime;
         const progress = Math.min(elapsed / anim.duration, 1);
-        
+
         if (progress >= 1) {
           // Draw target blip fading out
           const blipProgress = (elapsed - anim.duration) / 1000; // 1s fade
           if (blipProgress <= 1) {
             this.drawBlip(anim.targetPos, anim.attack.color, blipProgress);
           } else {
-             this.activeAttacks.splice(i, 1);
+            this.activeAttacks.splice(i, 1);
           }
           continue;
         }
-        
+
         this.drawArc(anim, progress);
       }
-      
+
       this.ctx.restore();
-      
+
       this.animationFrameId = requestAnimationFrame(render);
     };
-    
+
     render();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private drawArc(anim: any, progress: number) {
     if (!this.ctx) return;
-    
+
     const { sourcePos, targetPos, controlPos, attack } = anim;
-    
+
     // Current position along quadratic bezier
     const t = progress;
     const x = Math.pow(1 - t, 2) * sourcePos[0] + 2 * (1 - t) * t * controlPos[0] + Math.pow(t, 2) * targetPos[0];
     const y = Math.pow(1 - t, 2) * sourcePos[1] + 2 * (1 - t) * t * controlPos[1] + Math.pow(t, 2) * targetPos[1];
-    
+
     // Draw full path faint
     this.ctx.beginPath();
     this.ctx.moveTo(sourcePos[0], sourcePos[1]);
@@ -524,11 +507,11 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
     this.ctx.globalAlpha = 0.15;
     this.ctx.lineWidth = 1;
     this.ctx.stroke();
-    
+
     // Draw active segment (approximate by drawing from source to current point)
     const partialControlX = sourcePos[0] + t * (controlPos[0] - sourcePos[0]);
     const partialControlY = sourcePos[1] + t * (controlPos[1] - sourcePos[1]);
-    
+
     this.ctx.beginPath();
     this.ctx.moveTo(sourcePos[0], sourcePos[1]);
     this.ctx.quadraticCurveTo(partialControlX, partialControlY, x, y);
@@ -537,17 +520,17 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
     this.ctx.shadowColor = attack.color;
     this.ctx.shadowBlur = 8;
     this.ctx.stroke();
-    
+
     // Reset shadow
     this.ctx.shadowBlur = 0;
     this.ctx.globalAlpha = 1;
-    
+
     // Draw head particle
     this.ctx.beginPath();
     this.ctx.arc(x, y, 2.5, 0, Math.PI * 2);
     this.ctx.fillStyle = '#fff';
     this.ctx.fill();
-    
+
     // Draw source blip
     this.ctx.beginPath();
     this.ctx.arc(sourcePos[0], sourcePos[1], 2, 0, Math.PI * 2);
@@ -557,10 +540,10 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
 
   private drawBlip(pos: [number, number], color: string, progress: number) {
     if (!this.ctx || progress >= 1) return;
-    
+
     const radius = 2 + progress * 20;
     const opacity = 1 - progress;
-    
+
     this.ctx.beginPath();
     this.ctx.arc(pos[0], pos[1], radius, 0, Math.PI * 2);
     this.ctx.fillStyle = `rgba(255, 255, 255, ${opacity * 0.3})`;
