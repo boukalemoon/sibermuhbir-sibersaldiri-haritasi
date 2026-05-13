@@ -7,7 +7,7 @@ import { ThreatService } from '../../services/threat.service';
   template: `
     <div class="h-full flex flex-col gap-2.5">
 
-      <!-- Active Threats + Rate -->
+      <!-- Aktif Tehditler + Hız -->
       <div class="shrink-0 rounded-xl p-3.5 flex items-center justify-between"
            style="background:rgba(15,23,42,0.92);border:1px solid rgba(51,65,85,0.5);box-shadow:0 4px 24px rgba(0,0,0,0.5);">
         <div>
@@ -23,9 +23,9 @@ import { ThreatService } from '../../services/threat.service';
           </div>
         </div>
         <div class="text-right">
-          <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Rate</div>
+          <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">Hız</div>
           <div class="text-lg font-mono font-bold" [style.color]="threatLevelColor()">
-            {{ attackRate() }}<span class="text-xs text-slate-500 font-normal ml-0.5">/min</span>
+            {{ attackRate() }}<span class="text-xs text-slate-500 font-normal ml-0.5">/dakika</span>
           </div>
           <div class="text-[10px] font-bold tracking-wider mt-0.5" [style.color]="threatLevelColor()">
             {{ threatLevel() }}
@@ -41,7 +41,7 @@ import { ThreatService } from '../../services/threat.service';
           <svg class="w-3.5 h-3.5 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Top Attack Sources</span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">En Çok Saldıran Kaynaklar</span>
         </div>
         <div class="flex-1 px-3.5 py-2.5 space-y-2.5 overflow-hidden">
           @for (item of topAttackers(); track item.name; let i = $index) {
@@ -70,7 +70,7 @@ import { ThreatService } from '../../services/threat.service';
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Top Targeted</span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">En Çok Hedeflenen</span>
         </div>
         <div class="flex-1 px-3.5 py-2.5 space-y-2.5 overflow-hidden">
           @for (item of topTargets(); track item.name; let i = $index) {
@@ -98,7 +98,7 @@ import { ThreatService } from '../../services/threat.service';
           <svg class="w-3.5 h-3.5 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Attack Vectors</span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Saldırı Yöntemleri</span>
         </div>
         <div class="flex-1 px-3.5 py-2.5 space-y-2.5 overflow-hidden">
           @for (item of topTypes(); track item.name) {

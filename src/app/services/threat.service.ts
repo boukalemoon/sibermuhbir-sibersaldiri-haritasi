@@ -1,4 +1,7 @@
+import { Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Injectable, signal, computed, OnDestroy } from '@angular/core';
+
 
 export interface Attack {
   id: string;
@@ -18,61 +21,61 @@ export interface Attack {
 }
 
 const COUNTRIES = [
-  { code: 'US', name: 'United States', lat: 38, lng: -97, weight: 100 },
-  { code: 'CN', name: 'China', lat: 35, lng: 105, weight: 80 },
-  { code: 'RU', name: 'Russia', lat: 60, lng: 100, weight: 70 },
-  { code: 'BR', name: 'Brazil', lat: -10, lng: -55, weight: 40 },
-  { code: 'IN', name: 'India', lat: 20, lng: 77, weight: 50 },
-  { code: 'DE', name: 'Germany', lat: 51, lng: 9, weight: 60 },
-  { code: 'GB', name: 'United Kingdom', lat: 55, lng: -3, weight: 60 },
-  { code: 'FR', name: 'France', lat: 46, lng: 2, weight: 50 },
-  { code: 'JP', name: 'Japan', lat: 36, lng: 138, weight: 40 },
-  { code: 'KR', name: 'South Korea', lat: 36, lng: 128, weight: 30 },
-  { code: 'IR', name: 'Iran', lat: 32, lng: 53, weight: 40 },
-  { code: 'KP', name: 'North Korea', lat: 40, lng: 127, weight: 30 },
-  { code: 'UA', name: 'Ukraine', lat: 48, lng: 31, weight: 40 },
-  { code: 'IL', name: 'Israel', lat: 31, lng: 34, weight: 30 },
-  { code: 'ZA', name: 'South Africa', lat: -30, lng: 25, weight: 20 },
-  { code: 'AU', name: 'Australia', lat: -25, lng: 133, weight: 30 },
-  { code: 'CA', name: 'Canada', lat: 60, lng: -95, weight: 40 },
-  { code: 'MX', name: 'Mexico', lat: 23, lng: -102, weight: 30 },
-  { code: 'IT', name: 'Italy', lat: 42, lng: 12, weight: 30 },
-  { code: 'ES', name: 'Spain', lat: 40, lng: -4, weight: 30 },
-  { code: 'NL', name: 'Netherlands', lat: 52, lng: 5, weight: 40 },
-  { code: 'SE', name: 'Sweden', lat: 60, lng: 15, weight: 20 },
-  { code: 'CH', name: 'Switzerland', lat: 47, lng: 8, weight: 20 },
-  { code: 'SG', name: 'Singapore', lat: 1.3, lng: 103.8, weight: 30 },
-  { code: 'TW', name: 'Taiwan', lat: 23.5, lng: 121, weight: 30 },
+  { code: 'US', name: 'Amerika Birleşik Devletleri', lat: 38, lng: -97, weight: 100 },
+  { code: 'CN', name: 'Çin', lat: 35, lng: 105, weight: 80 },
+  { code: 'RU', name: 'Rusya', lat: 60, lng: 100, weight: 70 },
+  { code: 'BR', name: 'Brezilya', lat: -10, lng: -55, weight: 40 },
+  { code: 'IN', name: 'Hindistan', lat: 20, lng: 77, weight: 50 },
+  { code: 'DE', name: 'Almanya', lat: 51, lng: 9, weight: 60 },
+  { code: 'GB', name: 'Birleşik Krallık', lat: 55, lng: -3, weight: 60 },
+  { code: 'FR', name: 'Fransa', lat: 46, lng: 2, weight: 50 },
+  { code: 'JP', name: 'Japonya', lat: 36, lng: 138, weight: 40 },
+  { code: 'KR', name: 'Güney Kore', lat: 36, lng: 128, weight: 30 },
+  { code: 'IR', name: 'İran', lat: 32, lng: 53, weight: 40 },
+  { code: 'KP', name: 'Kuzey Kore', lat: 40, lng: 127, weight: 30 },
+  { code: 'UA', name: 'Ukrayna', lat: 48, lng: 31, weight: 40 },
+  { code: 'IL', name: 'İsrail', lat: 31, lng: 34, weight: 30 },
+  { code: 'ZA', name: 'Güney Afrika', lat: -30, lng: 25, weight: 20 },
+  { code: 'AU', name: 'Avustralya', lat: -25, lng: 133, weight: 30 },
+  { code: 'CA', name: 'Kanada', lat: 60, lng: -95, weight: 40 },
+  { code: 'MX', name: 'Meksika', lat: 23, lng: -102, weight: 30 },
+  { code: 'IT', name: 'İtalya', lat: 42, lng: 12, weight: 30 },
+  { code: 'ES', name: 'İspanya', lat: 40, lng: -4, weight: 30 },
+  { code: 'NL', name: 'Hollanda', lat: 52, lng: 5, weight: 40 },
+  { code: 'SE', name: 'İsveç', lat: 60, lng: 15, weight: 20 },
+  { code: 'CH', name: 'İsviçre', lat: 47, lng: 8, weight: 20 },
+  { code: 'SG', name: 'Singapur', lat: 1.3, lng: 103.8, weight: 30 },
+  { code: 'TW', name: 'Tayvan', lat: 23.5, lng: 121, weight: 30 },
   { code: 'VN', name: 'Vietnam', lat: 14, lng: 108, weight: 20 },
-  { code: 'TR', name: 'Turkey', lat: 39, lng: 35, weight: 30 },
-  { code: 'SA', name: 'Saudi Arabia', lat: 25, lng: 45, weight: 20 },
-  { code: 'AE', name: 'United Arab Emirates', lat: 24, lng: 54, weight: 20 },
-  { code: 'NG', name: 'Nigeria', lat: 10, lng: 8, weight: 10 },
-  { code: 'EG', name: 'Egypt', lat: 26, lng: 30, weight: 10 },
-  { code: 'AR', name: 'Argentina', lat: -34, lng: -64, weight: 20 },
-  { code: 'CO', name: 'Colombia', lat: 4, lng: -72, weight: 10 },
-  { code: 'CL', name: 'Chile', lat: -35, lng: -71, weight: 10 },
+  { code: 'TR', name: 'Türkiye', lat: 39, lng: 35, weight: 30 },
+  { code: 'SA', name: 'Suudi Arabistan', lat: 25, lng: 45, weight: 20 },
+  { code: 'AE', name: 'Birleşik Arap Emirlikleri', lat: 24, lng: 54, weight: 20 },
+  { code: 'NG', name: 'Nijerya', lat: 10, lng: 8, weight: 10 },
+  { code: 'EG', name: 'Mısır', lat: 26, lng: 30, weight: 10 },
+  { code: 'AR', name: 'Arjantin', lat: -34, lng: -64, weight: 20 },
+  { code: 'CO', name: 'Kolombiya', lat: 4, lng: -72, weight: 10 },
+  { code: 'CL', name: 'Şili', lat: -35, lng: -71, weight: 10 },
   { code: 'PE', name: 'Peru', lat: -10, lng: -76, weight: 10 },
   { code: 'VE', name: 'Venezuela', lat: 8, lng: -66, weight: 10 },
   { code: 'PK', name: 'Pakistan', lat: 30, lng: 70, weight: 20 },
-  { code: 'BD', name: 'Bangladesh', lat: 24, lng: 90, weight: 10 },
-  { code: 'ID', name: 'Indonesia', lat: -5, lng: 120, weight: 20 },
-  { code: 'PH', name: 'Philippines', lat: 13, lng: 122, weight: 10 },
-  { code: 'TH', name: 'Thailand', lat: 15, lng: 100, weight: 10 },
-  { code: 'MY', name: 'Malaysia', lat: 4, lng: 109, weight: 10 },
-  { code: 'NZ', name: 'New Zealand', lat: -40, lng: 174, weight: 10 },
-  { code: 'PL', name: 'Poland', lat: 52, lng: 20, weight: 20 },
-  { code: 'RO', name: 'Romania', lat: 46, lng: 25, weight: 10 },
-  { code: 'GR', name: 'Greece', lat: 39, lng: 22, weight: 10 },
-  { code: 'PT', name: 'Portugal', lat: 39, lng: -8, weight: 10 },
-  { code: 'CZ', name: 'Czechia', lat: 50, lng: 15, weight: 10 },
-  { code: 'HU', name: 'Hungary', lat: 47, lng: 20, weight: 10 },
-  { code: 'AT', name: 'Austria', lat: 47, lng: 13, weight: 10 },
-  { code: 'BE', name: 'Belgium', lat: 50, lng: 4, weight: 10 },
-  { code: 'DK', name: 'Denmark', lat: 56, lng: 10, weight: 10 },
-  { code: 'FI', name: 'Finland', lat: 64, lng: 26, weight: 10 },
-  { code: 'NO', name: 'Norway', lat: 62, lng: 10, weight: 10 },
-  { code: 'IE', name: 'Ireland', lat: 53, lng: -8, weight: 10 },
+  { code: 'BD', name: 'Bangladeş', lat: 24, lng: 90, weight: 10 },
+  { code: 'ID', name: 'Endonezya', lat: -5, lng: 120, weight: 20 },
+  { code: 'PH', name: 'Filipinler', lat: 13, lng: 122, weight: 10 },
+  { code: 'TH', name: 'Tayland', lat: 15, lng: 100, weight: 10 },
+  { code: 'MY', name: 'Malezya', lat: 4, lng: 109, weight: 10 },
+  { code: 'NZ', name: 'Yeni Zelanda', lat: -40, lng: 174, weight: 10 },
+  { code: 'PL', name: 'Polonya', lat: 52, lng: 20, weight: 20 },
+  { code: 'RO', name: 'Romanya', lat: 46, lng: 25, weight: 10 },
+  { code: 'GR', name: 'Yunanistan', lat: 39, lng: 22, weight: 10 },
+  { code: 'PT', name: 'Portekiz', lat: 39, lng: -8, weight: 10 },
+  { code: 'CZ', name: 'Çekya', lat: 50, lng: 15, weight: 10 },
+  { code: 'HU', name: 'Macaristan', lat: 47, lng: 20, weight: 10 },
+  { code: 'AT', name: 'Avusturya', lat: 47, lng: 13, weight: 10 },
+  { code: 'BE', name: 'Belçika', lat: 50, lng: 4, weight: 10 },
+  { code: 'DK', name: 'Danimarka', lat: 56, lng: 10, weight: 10 },
+  { code: 'FI', name: 'Finlandiya', lat: 64, lng: 26, weight: 10 },
+  { code: 'NO', name: 'Norveç', lat: 62, lng: 10, weight: 10 },
+  { code: 'IE', name: 'İrlanda', lat: 53, lng: -8, weight: 10 },
 ];
 
 const ATTACK_TYPES = [
@@ -149,12 +152,14 @@ export class ThreatService implements OnDestroy {
   allAttackTypes = ATTACK_TYPES;
 
   private totalWeight = COUNTRIES.reduce((sum, c) => sum + c.weight, 0);
-  private pollingInterval: any;      // setInterval için
-  private simulationTimeout: any;    // setTimeout için
+  private pollingInterval: any;     // setInterval için
+  private simulationTimeout: any;   // setTimeout için
 
-  constructor() {
-    this.fetchRealData();      // Önce gerçek veriyi dene
-    this.startPolling();       // Her 30 saniyede bir yenile
+  constructor(@Inject(PLATFORM_ID) private platformId: any) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.fetchRealData();
+      this.startPolling();
+    }
   }
 
   private getRandomCountry() {
@@ -172,12 +177,15 @@ export class ThreatService implements OnDestroy {
     while (source.code === target.code) {
       target = this.getRandomCountry();
     }
+
     const type = ATTACK_TYPES[Math.floor(Math.random() * ATTACK_TYPES.length)];
     const ip = `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+
     const sourceLat = source.lat + (Math.random() * 4 - 2);
     const sourceLng = source.lng + (Math.random() * 4 - 2);
     const targetLat = target.lat + (Math.random() * 4 - 2);
     const targetLng = target.lng + (Math.random() * 4 - 2);
+
     return {
       id: Math.random().toString(36).substring(2, 9),
       timestamp: Date.now(),
@@ -196,16 +204,23 @@ export class ThreatService implements OnDestroy {
     };
   }
 
+
   private async fetchRealData() {
     try {
-      const response = await fetch('/api/threats');
+      // Server-side (SSR) ise absolute URL kullan
+      let apiUrl = '/api/threats';
+      if (typeof window === 'undefined') {
+        // Node.js ortamı (SSR) - kendi domainini yaz (localhost veya canlı URL)
+        apiUrl = 'http://localhost:4200/api/threats';  // local test için
+        // Canlıda ise: apiUrl = 'https://sibermuhbir-sibersaldiri-haritasi.vercel.app/api/threats';
+      }
+      const response = await fetch(apiUrl);
       const realAttacks: Attack[] = await response.json();
       if (realAttacks && realAttacks.length > 0) {
         this.attacks.set(realAttacks);
-        return; // Başarılı, simülasyonu durdur
+      } else {
+        this.startSimulation();
       }
-      // Boş yanıt gelirse simülasyonu başlat
-      this.startSimulation();
     } catch (error) {
       console.error('API hatası, simülasyon başlatılıyor:', error);
       this.startSimulation();
@@ -219,27 +234,36 @@ export class ThreatService implements OnDestroy {
   }
 
   private startSimulation() {
-    // Eğer zaten simülasyon çalışıyorsa tekrar başlatma
-    if (this.simulationTimeout) return;
+    // Başlangıçta boş dizi (hiç saldırı yok)
+    this.attacks.set([]);
 
-    // İlk 50 saldırıyı oluştur
-    const initial = [];
-    for (let i = 0; i < 50; i++) {
-      initial.push(this.generateAttack());
-    }
-    this.attacks.set(initial);
-
-    // Sürekli yeni saldırı ekle
-    const loop = () => {
-      const newAttack = this.generateAttack();
-      this.attacks.update(attacks => {
-        const updated = [newAttack, ...attacks];
-        if (updated.length > 200) updated.length = 200;
-        return updated;
-      });
-      this.simulationTimeout = setTimeout(loop, 50 + Math.random() * 750);
+    // İlk birkaç saldırıyı hızlıca ekleyelim (ani patlama olmasın)
+    let count = 0;
+    const addInitial = () => {
+      if (count < 10) {  // Sadece 10 saldırı ile başla (50 yerine)
+        const newAttack = this.generateAttack();
+        this.attacks.update(attacks => {
+          const updated = [newAttack, ...attacks];
+          if (updated.length > 200) updated.length = 200;
+          return updated;
+        });
+        count++;
+        setTimeout(addInitial, 100); // 100 ms aralıklarla ekle
+      } else {
+        // Normal döngüyü başlat
+        const loop = () => {
+          const newAttack = this.generateAttack();
+          this.attacks.update(attacks => {
+            const updated = [newAttack, ...attacks];
+            if (updated.length > 200) updated.length = 200;
+            return updated;
+          });
+          this.simulationTimeout = setTimeout(loop, 50 + Math.random() * 750);
+        };
+        loop();
+      }
     };
-    loop();
+    addInitial();
   }
 
   ngOnDestroy() {
