@@ -92,14 +92,12 @@ const ATTACK_TYPES = [
 })
 export class ThreatService implements OnDestroy {
   attacks = signal<Attack[]>([]);
-  
-  // Active attacks currently visualized (within last 1.5s)
+
   activeAttacksCount = computed(() => {
     const now = Date.now();
     return this.attacks().filter(a => now - a.timestamp <= 1500).length;
   });
-  
-  // Stats
+
   topAttackers = computed(() => {
     const counts = new Map<string, number>();
     for (const attack of this.attacks()) {
@@ -148,14 +146,15 @@ export class ThreatService implements OnDestroy {
   });
 
   totalCount = computed(() => this.attacks().length);
-
   allAttackTypes = ATTACK_TYPES;
 
-  private intervalId: ReturnType<typeof setTimeout> | undefined;
   private totalWeight = COUNTRIES.reduce((sum, c) => sum + c.weight, 0);
+  private pollingInterval: any;      // setInterval için
+  private simulationTimeout: any;    // setTimeout için
 
   constructor() {
-    this.startSimulation();
+    this.fetchRealData();      // Önce gerçek veriyi dene
+    this.startPolling();       // Her 30 saniyede bir yenile
   }
 
   private getRandomCountry() {
@@ -173,16 +172,12 @@ export class ThreatService implements OnDestroy {
     while (source.code === target.code) {
       target = this.getRandomCountry();
     }
-
     const type = ATTACK_TYPES[Math.floor(Math.random() * ATTACK_TYPES.length)];
     const ip = `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
-
-    // Add some jitter to lat/lng so they don't all originate from the exact same point
     const sourceLat = source.lat + (Math.random() * 4 - 2);
     const sourceLng = source.lng + (Math.random() * 4 - 2);
     const targetLat = target.lat + (Math.random() * 4 - 2);
     const targetLng = target.lng + (Math.random() * 4 - 2);
-
     return {
       id: Math.random().toString(36).substring(2, 9),
       timestamp: Date.now(),
@@ -201,35 +196,54 @@ export class ThreatService implements OnDestroy {
     };
   }
 
+  private async fetchRealData() {
+    try {
+      const response = await fetch('/api/threats');
+      const realAttacks: Attack[] = await response.json();
+      if (realAttacks && realAttacks.length > 0) {
+        this.attacks.set(realAttacks);
+        return; // Başarılı, simülasyonu durdur
+      }
+      // Boş yanıt gelirse simülasyonu başlat
+      this.startSimulation();
+    } catch (error) {
+      console.error('API hatası, simülasyon başlatılıyor:', error);
+      this.startSimulation();
+    }
+  }
+
+  private startPolling() {
+    this.pollingInterval = setInterval(() => {
+      this.fetchRealData();
+    }, 30000);
+  }
+
   private startSimulation() {
-    // Generate initial batch
+    // Eğer zaten simülasyon çalışıyorsa tekrar başlatma
+    if (this.simulationTimeout) return;
+
+    // İlk 50 saldırıyı oluştur
     const initial = [];
     for (let i = 0; i < 50; i++) {
       initial.push(this.generateAttack());
     }
     this.attacks.set(initial);
 
-    // Continuous generation
+    // Sürekli yeni saldırı ekle
     const loop = () => {
       const newAttack = this.generateAttack();
       this.attacks.update(attacks => {
         const updated = [newAttack, ...attacks];
-        if (updated.length > 200) {
-          updated.length = 200; // Keep last 200
-        }
+        if (updated.length > 200) updated.length = 200;
         return updated;
       });
-      
-      // Random interval between 50ms and 800ms
-      this.intervalId = setTimeout(loop, 50 + Math.random() * 750);
+      this.simulationTimeout = setTimeout(loop, 50 + Math.random() * 750);
     };
-    
     loop();
   }
 
   ngOnDestroy() {
-    if (this.intervalId) {
-      clearTimeout(this.intervalId);
-    }
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
+    if (this.simulationTimeout) clearTimeout(this.simulationTimeout);
   }
 }
