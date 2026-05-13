@@ -1,0 +1,70 @@
+<main class="w-screen h-screen bg-[#060b14] text-slate-200 overflow-hidden font-sans relative flex flex-col">
+
+  <!-- Header -->
+  <header class="h-14 shrink-0 z-20 flex items-center justify-between px-5 gap-4"
+          style="background: rgba(6,11,20,0.97); border-bottom: 1px solid rgba(51,65,85,0.4); box-shadow: 0 1px 24px rgba(0,0,0,0.6);">
+
+    <!-- Left: Brand -->
+    <div class="flex items-center gap-4 min-w-0">
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-60"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500" style="box-shadow:0 0 10px #ef4444;"></span>
+        </div>
+        <h1 class="text-sm font-bold tracking-[0.25em] uppercase text-slate-100 whitespace-nowrap">
+          <span style="color:#60a5fa;">SİBER MUHBİR</span> SALDIRI HARİTASI
+        </h1>
+      </div>
+
+      <!-- Threat Level Badge -->
+      <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider shrink-0"
+           [style.background]="threatLevelConfig[threatLevel()].bg"
+           [style.border]="'1px solid ' + threatLevelConfig[threatLevel()].border"
+           [style.color]="threatLevelConfig[threatLevel()].color">
+        <span class="w-1.5 h-1.5 rounded-full animate-pulse"
+              [style.background]="threatLevelConfig[threatLevel()].color"></span>
+        THREAT: {{ threatLevel() }}
+      </div>
+
+      <!-- Attack Rate -->
+      <div class="hidden md:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 shrink-0">
+        <span class="text-slate-300 font-bold">{{ attackRate() }}</span> attacks/min
+      </div>
+    </div>
+
+    <!-- Right: Status & Clock -->
+    <div class="flex items-center gap-5 shrink-0 text-[10px] font-mono">
+      <div class="hidden md:flex items-center gap-1.5 text-slate-400">
+        <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full" style="box-shadow:0 0 6px #10b981;"></span>
+        SYSTEM ONLINE
+      </div>
+      <div class="hidden md:flex items-center gap-1.5 text-slate-400">
+        <span class="w-1.5 h-1.5 bg-blue-500 rounded-full" style="box-shadow:0 0 6px #3b82f6;"></span>
+        DEFENSE ACTIVE
+      </div>
+      <div class="text-slate-400 font-bold border-l border-slate-700/60 pl-5">
+        {{ currentTime() }}
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="flex-1 relative overflow-hidden">
+
+    <!-- Map Background -->
+    <div class="absolute inset-0 z-0">
+      <app-threat-map></app-threat-map>
+    </div>
+
+    <!-- Overlay Panels -->
+    <div class="absolute inset-0 z-10 pointer-events-none p-3 flex justify-between gap-3">
+      <div class="w-72 h-full pointer-events-auto flex flex-col gap-3">
+        <app-threat-stats></app-threat-stats>
+      </div>
+      <div class="h-full pointer-events-auto" style="width:22rem;">
+        <app-threat-log></app-threat-log>
+      </div>
+    </div>
+
+  </div>
+</main>
