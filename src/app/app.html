@@ -109,69 +109,70 @@
       </div>
     </div>
 
-  </div>
+    <!-- News Bottom Panel -->
+    <div class="absolute bottom-0 left-0 right-0 z-40 news-panel-slide"
+         [class.news-panel-open]="newsOpen()"
+         style="height:300px;">
 
-  <!-- News Modal -->
-  @if (newsOpen()) {
-  <div class="absolute inset-0 z-50 flex items-center justify-center p-4"
-       style="background:rgba(0,0,0,0.75); backdrop-filter:blur(4px);"
-       (click)="newsOpen.set(false)">
-    <div class="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-xl overflow-hidden"
-         style="background:rgba(6,11,20,0.98); border:1px solid rgba(16,185,129,0.3); box-shadow:0 24px 60px rgba(0,0,0,0.8);"
-         (click)="$event.stopPropagation()">
-
-      <!-- Modal Header -->
-      <div class="px-5 py-3.5 flex justify-between items-center shrink-0"
-           style="border-bottom:1px solid rgba(51,65,85,0.5); background:rgba(10,15,30,0.8);">
-        <div class="flex items-center gap-2.5">
+      <!-- Panel Header -->
+      <div class="flex items-center justify-between px-4 py-2 shrink-0"
+           style="background:rgba(4,10,20,0.98); border-top:1px solid rgba(16,185,129,0.4); border-bottom:1px solid rgba(30,41,59,0.6);">
+        <div class="flex items-center gap-3">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <h2 class="text-sm font-bold text-slate-100 uppercase tracking-wider">Siber Güvenlik Haberleri</h2>
-          <span class="text-[10px] font-mono text-slate-500 ml-1">{{ news().length }} haber</span>
+          <span class="text-[11px] font-black text-emerald-400 uppercase tracking-widest">Siber Güvenlik Haberleri</span>
+          <span class="text-[10px] font-mono text-slate-600">{{ news().length }} kaynak haberi</span>
         </div>
-        <button (click)="newsOpen.set(false)"
-                class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-all text-sm">✕</button>
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 text-[9px] font-mono text-slate-600">
+            @for (src of newsSources(); track src) {
+              <span class="px-1.5 py-0.5 rounded"
+                    style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#6ee7b7;">{{ src }}</span>
+            }
+          </div>
+          <button (click)="newsOpen.set(false)"
+                  class="w-6 h-6 flex items-center justify-center rounded text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-all text-xs">✕</button>
+        </div>
       </div>
 
-      <!-- News List -->
-      <div class="flex-1 overflow-y-auto news-scroll">
-        @for (item of news(); track item.link; let i = $index) {
-          <a [href]="item.link" target="_blank" rel="noopener"
-             class="block px-5 py-3.5 transition-all duration-150 cursor-pointer"
-             style="border-bottom:1px solid rgba(30,41,59,0.6);"
-             [style.background]="'transparent'"
-             onmouseenter="this.style.background='rgba(16,185,129,0.05)'"
-             onmouseleave="this.style.background='transparent'">
-            <div class="flex items-start gap-3">
-              <span class="shrink-0 mt-0.5 text-[10px] font-mono font-bold w-5 text-center"
-                    style="color:rgba(16,185,129,0.5);">{{ i + 1 }}</span>
-              <div class="flex-1 min-w-0">
-                <div class="text-[12px] font-semibold text-slate-200 leading-snug mb-1.5">{{ item.title }}</div>
-                @if (item.contentSnippet) {
-                  <div class="text-[11px] text-slate-500 leading-relaxed line-clamp-2 mb-1.5">{{ item.contentSnippet }}</div>
-                }
-                <div class="flex items-center gap-3 text-[10px] font-mono text-slate-600">
-                  @if (item.source) {
-                    <span class="text-emerald-600">{{ item.source }}</span>
-                  }
-                  @if (item.pubDate) {
-                    <span>{{ item.pubDate | date:'dd MMM yyyy, HH:mm' }}</span>
-                  }
-                  <span class="text-slate-700 ml-auto">↗ Habere git</span>
-                </div>
+      <!-- News Grid -->
+      <div class="flex-1 overflow-x-auto overflow-y-hidden news-scroll-x"
+           style="background:rgba(4,8,16,0.97); height:calc(300px - 37px);">
+        <div class="flex gap-0 h-full" style="width:max-content;">
+          @for (item of news(); track item.link; let i = $index) {
+            <a [href]="item.link" target="_blank" rel="noopener"
+               class="news-card flex flex-col justify-between h-full cursor-pointer"
+               style="width:280px; padding:12px 14px; border-right:1px solid rgba(30,41,59,0.5);">
+              <!-- Source + Time -->
+              <div class="flex items-center justify-between mb-2 shrink-0">
+                <span class="text-[9px] font-black uppercase tracking-widest"
+                      style="color:#6ee7b7;">{{ item.source || 'HABER' }}</span>
+                <span class="text-[9px] font-mono text-slate-600">
+                  {{ item.pubDate | date:'dd MMM, HH:mm' }}
+                </span>
               </div>
+              <!-- Headline -->
+              <div class="flex-1 overflow-hidden">
+                <div class="text-[11px] font-semibold text-slate-200 leading-snug line-clamp-3 mb-2">{{ item.title }}</div>
+                @if (item.contentSnippet) {
+                  <div class="text-[10px] text-slate-600 leading-relaxed line-clamp-2">{{ item.contentSnippet }}</div>
+                }
+              </div>
+              <!-- Link -->
+              <div class="shrink-0 mt-2 text-[9px] font-mono text-slate-700 flex items-center gap-1">
+                <span style="color:rgba(16,185,129,0.5);">↗</span> Habere git
+              </div>
+            </a>
+          }
+          @if (news().length === 0) {
+            <div class="flex items-center justify-center h-full text-slate-700 text-xs font-mono px-10">
+              Haberler yükleniyor...
             </div>
-          </a>
-        }
-        @if (news().length === 0) {
-          <div class="flex flex-col items-center justify-center py-16 text-slate-600">
-            <div class="text-3xl mb-3">📡</div>
-            <div class="text-xs font-mono tracking-wider">Haberler yükleniyor...</div>
-          </div>
-        }
+          }
+        </div>
       </div>
 
     </div>
+
   </div>
-  }
 
 </main>

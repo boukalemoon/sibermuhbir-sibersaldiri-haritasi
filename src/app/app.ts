@@ -24,6 +24,10 @@ export class App implements OnInit, OnDestroy {
   newsOpen = signal(false);
 
   news = this.newsService.news;
+  newsSources = computed(() => {
+    const sources = [...new Set(this.newsService.news().map(n => n.source).filter(Boolean))];
+    return sources.slice(0, 4);
+  });
   tickerText = computed(() => {
     const items = this.newsService.news();
     if (!items.length) return 'Siber güvenlik haberleri yükleniyor...';

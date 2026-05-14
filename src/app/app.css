@@ -7,6 +7,36 @@
   white-space: nowrap;
   animation: ticker-scroll 90s linear infinite;
 }
+
+/* News bottom panel slide */
+.news-panel-slide {
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+.news-panel-open {
+  transform: translateY(0);
+}
+
+/* News horizontal scroll */
+.news-scroll-x::-webkit-scrollbar { height: 3px; }
+.news-scroll-x::-webkit-scrollbar-track { background: transparent; }
+.news-scroll-x::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 4px; }
+
+/* News card hover */
+.news-card {
+  background: transparent;
+  transition: background 0.15s;
+}
+.news-card:hover {
+  background: rgba(16, 185, 129, 0.04) !important;
+}
+.news-card:hover .text-slate-200 {
+  color: #e2e8f0;
+}
+
+/* Vertical news scroll (modal fallback) */
 .news-scroll::-webkit-scrollbar { width: 4px; }
 .news-scroll::-webkit-scrollbar-track { background: transparent; }
 .news-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
