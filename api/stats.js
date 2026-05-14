@@ -19,6 +19,8 @@ export default async function handler(req, res) {
   const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 
   const period = req.query.period || 'weekly';
+  // historical=30|60|90|365 ise country_daily_stats'tan okur (uzun dönem)
+  const historical = parseInt(req.query.historical || '0', 10);
   const hoursMap = { daily: 24, weekly: 168, monthly: 720 };
   const hours = hoursMap[period] || 168;
 
@@ -29,6 +31,34 @@ export default async function handler(req, res) {
   };
 
   try {
+    // Uzun dönem tarihsel veri (30-365 gün) — country_daily_stats tablosundan
+    if (historical > 0) {
+      const [histResp, dailyTotalsResp] = await Promise.all([
+        fetch(`${SUPABASE_URL}/rest/v1/rpc/get_historical_country_stats`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ days_back: historical }),
+        }),
+        fetch(`${SUPABASE_URL}/rest/v1/rpc/get_daily_totals`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ days_back: historical }),
+        }),
+      ]);
+      const [histData, dailyTotals] = await Promise.all([histResp.json(), dailyTotalsResp.json()]);
+      const countries = Array.isArray(histData) ? histData : [];
+      return res.status(200).json({
+        generated_at: new Date().toISOString(),
+        period: `historical_${historical}d`,
+        days_back: historical,
+        top_targeted_countries: countries.sort((a, b) => b.total_as_target - a.total_as_target).slice(0, 20),
+        top_source_countries: countries.sort((a, b) => b.total_as_source - a.total_as_source).slice(0, 20),
+        daily_totals: Array.isArray(dailyTotals) ? dailyTotals : [],
+        total_attacks: countries.reduce((s, c) => s + Number(c.grand_total || 0), 0) / 2,
+        _description: `Siber Muhbir Attack Map — Son ${historical} günün tarihsel istatistikleri (country_daily_stats)`,
+      });
+    }
+
     const [summaryResp, countryResp, typeResp, hourlyResp] = await Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/rpc/get_summary_stats`, {
         method: 'POST',
