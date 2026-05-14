@@ -184,15 +184,27 @@ export class ThreatService implements OnDestroy {
   totalCount = computed(() => this.attacks().length);
   allAttackTypes = ATTACK_TYPES;
 
+  // Haftalık Supabase istatistikleri (heatmap + panel için)
+  weeklyStats = signal<{ country: string; as_source: number; as_target: number; total: number }[]>([]);
+  weeklyTopTypes = signal<{ attack_type: string; count: number }[]>([]);
+  weeklyTotal = signal(0);
+
   private platformId = inject(PLATFORM_ID);
   private totalWeight = COUNTRIES.reduce((sum, c) => sum + c.weight, 0);
   private pollingInterval: any;
   private simulationTimeout: any;
+  private logInterval: any;
+  private weeklyInterval: any;
+  private logBuffer: Attack[] = [];
+  private logCounter = 0;
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.fetchRealData();
       this.startPolling();
+      this.startLogInterval();
+      this.loadPublicStats();
+      this.weeklyInterval = setInterval(() => this.loadPublicStats(), 300_000); // 5 dk
     }
   }
 
@@ -292,6 +304,11 @@ export class ThreatService implements OnDestroy {
             if (updated.length > 500) updated.length = 500;
             return updated;
           });
+          // 10'da 1 örnekleme ile log buffer'a ekle
+          this.logCounter++;
+          if (this.logCounter % 10 === 0) {
+            this.logBuffer.push(newAttack);
+          }
           this.simulationTimeout = setTimeout(loop, 50 + Math.random() * 750);
         };
         loop();
@@ -300,8 +317,38 @@ export class ThreatService implements OnDestroy {
     addInitial();
   }
 
+  private async loadPublicStats() {
+    try {
+      const resp = await fetch('/api/public-stats');
+      if (!resp.ok) return;
+      const data = await resp.json();
+      if (Array.isArray(data.countries)) this.weeklyStats.set(data.countries);
+      if (Array.isArray(data.top_types)) this.weeklyTopTypes.set(data.top_types);
+      if (typeof data.total === 'number') this.weeklyTotal.set(data.total);
+    } catch { /* sunucu yoksa sessiz hata */ }
+  }
+
+  private startLogInterval() {
+    // Her 60 saniyede bir birikmiş saldırıları Supabase'e gönder
+    this.logInterval = setInterval(() => this.flushLogBuffer(), 60_000);
+  }
+
+  private flushLogBuffer() {
+    if (this.logBuffer.length === 0) return;
+    const batch = [...this.logBuffer];
+    this.logBuffer = [];
+    fetch('/api/log-attack', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(batch),
+    }).catch(() => { /* sessizce hata yut */ });
+  }
+
   ngOnDestroy() {
     if (this.pollingInterval) clearInterval(this.pollingInterval);
     if (this.simulationTimeout) clearTimeout(this.simulationTimeout);
+    if (this.logInterval) clearInterval(this.logInterval);
+    if (this.weeklyInterval) clearInterval(this.weeklyInterval);
+    this.flushLogBuffer();
   }
 }

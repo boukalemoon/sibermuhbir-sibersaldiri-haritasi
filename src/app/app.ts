@@ -67,6 +67,9 @@ export class App implements OnInit, OnDestroy {
   attackRate = this.threatService.attackRate;
   threatLevel = this.threatService.threatLevel;
   totalCount = this.threatService.totalCount;
+  weeklyStats = this.threatService.weeklyStats;
+  weeklyTopTypes = this.threatService.weeklyTopTypes;
+  weeklyTotal = this.threatService.weeklyTotal;
 
   threatLevelConfig = {
     CRITICAL: { color: '#ef4444', bg: 'rgba(127,29,29,0.4)', border: 'rgba(185,28,28,0.6)' },

@@ -93,9 +93,57 @@
 
     <!-- Desktop Overlay Panels -->
     <div class="hidden md:flex absolute inset-0 z-10 pointer-events-none p-3 justify-between gap-3">
-      <div class="w-72 h-full pointer-events-auto flex flex-col gap-3">
+      <div class="w-72 h-full pointer-events-auto flex flex-col gap-3 overflow-hidden">
         <app-threat-stats></app-threat-stats>
+
+        <!-- Bu Hafta Paneli (Supabase) -->
+        <div class="shrink-0 rounded-xl overflow-hidden"
+             style="background:rgba(6,11,20,0.88);border:1px solid rgba(51,65,85,0.45);backdrop-filter:blur(8px);">
+          <div class="px-3 py-2 flex items-center justify-between"
+               style="border-bottom:1px solid rgba(51,65,85,0.35);background:rgba(10,15,30,0.7);">
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
+              <span class="text-[9px] font-black uppercase tracking-widest text-violet-400">Bu Hafta</span>
+            </div>
+            @if (weeklyTotal() > 0) {
+              <span class="text-[9px] font-mono text-slate-500">{{ weeklyTotal() }} kayıt</span>
+            }
+          </div>
+          @if (weeklyTotal() === 0) {
+            <div class="px-3 py-3 text-[9px] text-slate-600 font-mono text-center">
+              Veri toplanıyor...
+            </div>
+          } @else {
+            <div class="p-2 space-y-1">
+              <div class="text-[8px] font-bold text-slate-600 uppercase tracking-widest px-1 mb-1">En Çok Hedef Alınan</div>
+              @for (s of weeklyStats().slice(0,5); track s.country) {
+                <div class="flex items-center gap-2 px-1.5 py-1 rounded"
+                     style="background:rgba(15,23,42,0.5);">
+                  <div class="flex-1 min-w-0">
+                    <div class="text-[9px] text-slate-300 truncate font-mono">{{ s.country }}</div>
+                  </div>
+                  <div class="flex gap-2 text-[8px] font-mono shrink-0">
+                    <span class="text-red-400">↑{{ s.as_source }}</span>
+                    <span class="text-blue-400">↓{{ s.as_target }}</span>
+                  </div>
+                </div>
+              }
+              @if (weeklyTopTypes().length > 0) {
+                <div class="text-[8px] font-bold text-slate-600 uppercase tracking-widest px-1 mt-2 mb-1">Saldırı Tipleri</div>
+                <div class="flex flex-wrap gap-1 px-1">
+                  @for (t of weeklyTopTypes().slice(0,4); track t.attack_type) {
+                    <span class="px-1.5 py-0.5 rounded text-[8px] font-mono"
+                          style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.25);color:#a78bfa;">
+                      {{ t.attack_type }}: {{ t.count }}
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
       </div>
+
       <div class="h-full pointer-events-auto" style="width:22rem;">
         <app-threat-log></app-threat-log>
       </div>
@@ -109,7 +157,29 @@
         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">İstatistikler</span>
         <button (click)="mobilePanel.set('none')" class="text-slate-500 hover:text-slate-200 text-sm">✕</button>
       </div>
-      <div class="h-full overflow-y-auto p-3 pb-16"><app-threat-stats></app-threat-stats></div>
+      <div class="h-full overflow-y-auto p-3 pb-16 space-y-3">
+        <app-threat-stats></app-threat-stats>
+        <!-- Mobil: Bu Hafta özeti -->
+        @if (weeklyTotal() > 0) {
+          <div class="rounded-xl overflow-hidden"
+               style="background:rgba(10,15,30,0.9);border:1px solid rgba(124,58,237,0.35);">
+            <div class="px-3 py-2 flex items-center gap-2"
+                 style="border-bottom:1px solid rgba(51,65,85,0.35);">
+              <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
+              <span class="text-[9px] font-black uppercase tracking-widest text-violet-400">Bu Hafta — {{ weeklyTotal() }} Kayıt</span>
+            </div>
+            <div class="p-2 space-y-1">
+              @for (s of weeklyStats().slice(0,5); track s.country) {
+                <div class="flex items-center gap-2 px-1.5 py-1 rounded" style="background:rgba(15,23,42,0.5);">
+                  <div class="flex-1 text-[9px] text-slate-300 truncate font-mono">{{ s.country }}</div>
+                  <span class="text-[8px] text-red-400 font-mono">↑{{ s.as_source }}</span>
+                  <span class="text-[8px] text-blue-400 font-mono">↓{{ s.as_target }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- Mobile Log Bottom Sheet -->
