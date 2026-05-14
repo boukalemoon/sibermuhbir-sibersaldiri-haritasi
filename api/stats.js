@@ -59,6 +59,23 @@ export default async function handler(req, res) {
       });
     }
 
+    // Analytics raporu
+    if (req.query.type === 'analytics') {
+      const days = parseInt(req.query.days || '7', 10);
+      const resp = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_analytics_summary`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ days_back: days }),
+      });
+      const data = await resp.json();
+      return res.status(200).json({
+        generated_at: new Date().toISOString(),
+        period_days: days,
+        analytics: data,
+        _description: `Siber Muhbir — Son ${days} günün ziyaretçi ve etkinlik istatistikleri`,
+      });
+    }
+
     const [summaryResp, countryResp, typeResp, hourlyResp] = await Promise.all([
       fetch(`${SUPABASE_URL}/rest/v1/rpc/get_summary_stats`, {
         method: 'POST',
