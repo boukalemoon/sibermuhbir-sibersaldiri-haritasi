@@ -5,6 +5,7 @@ import {ThreatLogComponent} from './components/threat-log/threat-log.component';
 import {ThreatStatsComponent} from './components/threat-stats/threat-stats.component';
 import {ThreatService} from './services/threat.service';
 import {NewsService} from './services/news.service';
+import {AnalyticsService} from './services/analytics.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,6 +18,7 @@ export class App implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private threatService = inject(ThreatService);
   private newsService = inject(NewsService);
+  private analytics = inject(AnalyticsService);
   private clockInterval: ReturnType<typeof setInterval> | null = null;
 
   currentTime = signal('--:--:-- UTC');
@@ -35,9 +37,18 @@ export class App implements OnInit, OnDestroy {
     return items.map(n => n.title).join('   ◆   ');
   });
 
-  toggleMap() { this.mapVisible.update(v => !v); }
+  toggleMap() {
+    this.mapVisible.update(v => !v);
+    this.analytics.trackMapToggle(this.mapVisible());
+  }
   toggleMobilePanel(p: 'stats' | 'log') {
     this.mobilePanel.update(cur => cur === p ? 'none' : p);
+  }
+
+  toggleNews() {
+    const opening = !this.newsOpen();
+    this.newsOpen.set(opening);
+    if (opening) this.analytics.trackNewsOpen();
   }
 
   // Drag-to-scroll for news panel

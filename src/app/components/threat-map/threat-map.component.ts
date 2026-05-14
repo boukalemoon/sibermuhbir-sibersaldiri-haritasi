@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild, effect, inject, OnInit, OnDestroy, PL
 import { isPlatformBrowser, DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ThreatService, Attack } from '../../services/threat.service';
+import { AnalyticsService } from '../../services/analytics.service';
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
 @Component({
@@ -120,6 +121,7 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
   @ViewChild('canvasContainer', { static: true }) canvasContainer!: ElementRef<HTMLCanvasElement>;
 
   private threatService = inject(ThreatService);
+  private analytics = inject(AnalyticsService);
   private platformId = inject(PLATFORM_ID);
 
   private svg: any;
@@ -332,6 +334,7 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
           const name = d.properties.name;
           if (name) {
             const trName = this.getTurkishName(name);
+            this.analytics.trackCountryClick(trName);
             this.selectedCountry.set(trName);
             const attacks = this.threatService.attacks();
             const source = attacks.filter(a => a.sourceCountry === trName).length;
