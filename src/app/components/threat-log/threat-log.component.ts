@@ -15,17 +15,17 @@ import { DatePipe } from '@angular/common';
            style="border-bottom:1px solid rgba(51,65,85,0.4);background:rgba(10,15,28,0.6);">
         <div class="flex items-center gap-2">
           <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse" style="box-shadow:0 0 6px #ef4444;"></span>
-          <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Live Threat Log</span>
+          <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Canlı Tehdit Günlüğü</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-[10px] font-mono text-slate-500">{{ filteredAttacks().length }} events</span>
+          <span class="text-[10px] font-mono text-slate-500">{{ filteredAttacks().length }} olay</span>
           <!-- Auto-scroll toggle -->
           <button (click)="autoScroll.set(!autoScroll())"
                   class="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider transition-all duration-200"
                   [style.background]="autoScroll() ? 'rgba(37,99,235,0.3)' : 'rgba(51,65,85,0.3)'"
                   [style.color]="autoScroll() ? '#93c5fd' : '#64748b'"
                   [style.border]="autoScroll() ? '1px solid rgba(59,130,246,0.4)' : '1px solid rgba(51,65,85,0.4)'">
-            AUTO
+            OTO
           </button>
         </div>
       </div>
@@ -38,7 +38,7 @@ import { DatePipe } from '@angular/common';
                 [style.background]="selectedType() === null ? 'rgba(99,102,241,0.3)' : 'rgba(30,41,59,0.6)'"
                 [style.color]="selectedType() === null ? '#a5b4fc' : '#475569'"
                 [style.border]="selectedType() === null ? '1px solid rgba(99,102,241,0.4)' : '1px solid rgba(51,65,85,0.3)'">
-          ALL
+          Tümü  
         </button>
         @for (type of attackTypes(); track type.name) {
           <button (click)="selectedType.set(selectedType() === type.name ? null : type.name)"

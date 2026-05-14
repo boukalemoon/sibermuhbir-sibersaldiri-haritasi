@@ -16,7 +16,7 @@ import { ThreatService } from '../../services/threat.service';
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" style="box-shadow:0 0 8px #ef4444;"></span>
             </div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Threats</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Aktif Tehditler</span>
           </div>
           <div class="text-3xl font-mono font-black text-white tracking-widest" style="text-shadow:0 0 20px rgba(239,68,68,0.4);">
             {{ activeAttacksCount() }}

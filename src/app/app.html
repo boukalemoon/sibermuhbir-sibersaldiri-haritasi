@@ -23,12 +23,12 @@
            [style.color]="threatLevelConfig[threatLevel()].color">
         <span class="w-1.5 h-1.5 rounded-full animate-pulse"
               [style.background]="threatLevelConfig[threatLevel()].color"></span>
-        THREAT: {{ threatLevel() }}
+        TEHDİT: {{ threatLevel() }}
       </div>
 
       <!-- Attack Rate -->
       <div class="hidden md:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 shrink-0">
-        <span class="text-slate-300 font-bold">{{ attackRate() }}</span> attacks/min
+        <span class="text-slate-300 font-bold">{{ attackRate() }}</span> saldırı/dak
       </div>
     </div>
 
@@ -46,11 +46,11 @@
       </button>
       <div class="hidden md:flex items-center gap-1.5 text-slate-400">
         <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full" style="box-shadow:0 0 6px #10b981;"></span>
-        SYSTEM ONLINE
+        SİSTEM AKTİF
       </div>
       <div class="hidden md:flex items-center gap-1.5 text-slate-400">
         <span class="w-1.5 h-1.5 bg-blue-500 rounded-full" style="box-shadow:0 0 6px #3b82f6;"></span>
-        DEFENSE ACTIVE
+        SAVUNMA AKTİF
       </div>
       <div class="text-slate-400 font-bold border-l border-slate-700/60 pl-5">
         {{ currentTime() }}

@@ -41,7 +41,7 @@ import { NewsPanelComponent } from '../news-panel/news-panel.component';
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-20"></span>
             <span class="relative inline-flex rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent animate-spin"></span>
           </div>
-          <div class="text-blue-400 font-mono text-sm uppercase animate-pulse">Initializing...</div>
+          <div class="text-blue-400 font-mono text-sm uppercase animate-pulse">Yükleniyor...</div>
         </div>
       }
 
@@ -89,9 +89,9 @@ import { NewsPanelComponent } from '../news-panel/news-panel.component';
                     <div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full shrink-0" [style.background]="attack.color"></span><span class="text-slate-200 font-bold" style="width:6rem;">{{ attack.type }}</span></div>
                     <div class="text-slate-400 flex-1 text-center text-[10px]">
                       @if (attack.sourceCountry === selectedCountry()) {
-                        <span class="text-red-400 font-bold">OUT</span><span class="text-slate-600 mx-1">→</span>{{ attack.targetCountry }}
+                        <span class="text-red-400 font-bold">ÇIKIŞ</span><span class="text-slate-600 mx-1">→</span>{{ attack.targetCountry }}
                       } @else {
-                        <span class="text-blue-400 font-bold">IN</span><span class="text-slate-600 mx-1">←</span>{{ attack.sourceCountry }}
+                        <span class="text-blue-400 font-bold">GİRİŞ</span><span class="text-slate-600 mx-1">←</span>{{ attack.sourceCountry }}
                       }
                     </div>
                     <div class="text-slate-600 text-[10px] w-16 text-right">{{ attack.timestamp | date:'HH:mm:ss' }}</div>
@@ -150,10 +150,56 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
   selectedCountryAttacks = signal<Attack[]>([]);
 
   private turkishCountryNames: Record<string, string> = {
-    'United States': 'ABD', 'Russia': 'Rusya', 'China': 'Çin', 'India': 'Hindistan',
-    'Brazil': 'Brezilya', 'Germany': 'Almanya', 'United Kingdom': 'Birleşik Krallık',
-    'France': 'Fransa', 'Japan': 'Japonya', 'South Korea': 'Güney Kore', 'Iran': 'İran',
-    'Turkey': 'Türkiye', 'Ukraine': 'Ukrayna', 'Israel': 'İsrail', 'Canada': 'Kanada'
+    'Afghanistan': 'Afganistan', 'Albania': 'Arnavutluk', 'Algeria': 'Cezayir',
+    'Angola': 'Angola', 'Argentina': 'Arjantin', 'Armenia': 'Ermenistan',
+    'Australia': 'Avustralya', 'Austria': 'Avusturya', 'Azerbaijan': 'Azerbaycan',
+    'Bangladesh': 'Bangladeş', 'Belarus': 'Belarus', 'Belgium': 'Belçika',
+    'Benin': 'Benin', 'Bolivia': 'Bolivya', 'Bosnia and Herz.': 'Bosna Hersek',
+    'Bosnia and Herzegovina': 'Bosna Hersek', 'Botswana': 'Botsvana',
+    'Brazil': 'Brezilya', 'Bulgaria': 'Bulgaristan', 'Burkina Faso': 'Burkina Faso',
+    'Cambodia': 'Kamboçya', 'Cameroon': 'Kamerun', 'Canada': 'Kanada',
+    'Central African Rep.': 'Orta Afrika Cum.', 'Chad': 'Çad', 'Chile': 'Şili',
+    'China': 'Çin', 'Colombia': 'Kolombiya', 'Congo': 'Kongo',
+    'Croatia': 'Hırvatistan', 'Cuba': 'Küba', 'Cyprus': 'Kıbrıs',
+    'Czech Rep.': 'Çekya', 'Czechia': 'Çekya', 'Denmark': 'Danimarka',
+    'Dem. Rep. Congo': 'Kongo DRC', 'Djibouti': 'Cibuti', 'Ecuador': 'Ekvador',
+    'Egypt': 'Mısır', 'Eritrea': 'Eritre', 'Estonia': 'Estonya',
+    'Ethiopia': 'Etiyopya', 'Finland': 'Finlandiya', 'France': 'Fransa',
+    'Georgia': 'Gürcistan', 'Germany': 'Almanya', 'Ghana': 'Gana',
+    'Greece': 'Yunanistan', 'Guatemala': 'Guatemala', 'Guinea': 'Gine',
+    'Honduras': 'Honduras', 'Hungary': 'Macaristan', 'India': 'Hindistan',
+    'Indonesia': 'Endonezya', 'Iran': 'İran', 'Iraq': 'Irak',
+    'Ireland': 'İrlanda', 'Israel': 'İsrail', 'Italy': 'İtalya',
+    'Japan': 'Japonya', 'Jordan': 'Ürdün', 'Kazakhstan': 'Kazakistan',
+    'Kenya': 'Kenya', 'Kosovo': 'Kosova', 'Kuwait': 'Kuveyt',
+    'Kyrgyzstan': 'Kırgızistan', 'Laos': 'Laos', 'Latvia': 'Letonya',
+    'Lebanon': 'Lübnan', 'Liberia': 'Liberya', 'Libya': 'Libya',
+    'Lithuania': 'Litvanya', 'Madagascar': 'Madagaskar', 'Malaysia': 'Malezya',
+    'Mali': 'Mali', 'Mauritania': 'Moritanya', 'Mexico': 'Meksika',
+    'Moldova': 'Moldova', 'Mongolia': 'Moğolistan', 'Montenegro': 'Karadağ',
+    'Morocco': 'Fas', 'Mozambique': 'Mozambik', 'Myanmar': 'Myanmar',
+    'Namibia': 'Namibya', 'Nepal': 'Nepal', 'Netherlands': 'Hollanda',
+    'New Caledonia': 'Yeni Kaledonya', 'New Zealand': 'Yeni Zelanda',
+    'Niger': 'Nijer', 'Nigeria': 'Nijerya', 'North Korea': 'Kuzey Kore',
+    'North Macedonia': 'Kuzey Makedonya', 'Norway': 'Norveç', 'Oman': 'Umman',
+    'Pakistan': 'Pakistan', 'Palestine': 'Filistin', 'Papua New Guinea': 'Papua Yeni Gine',
+    'Peru': 'Peru', 'Philippines': 'Filipinler', 'Poland': 'Polonya',
+    'Portugal': 'Portekiz', 'Qatar': 'Katar', 'Romania': 'Romanya',
+    'Russia': 'Rusya', 'Bahrain': 'Bahreyn', 'Saudi Arabia': 'Suudi Arabistan',
+    'Senegal': 'Senegal', 'Serbia': 'Sırbistan', 'Sierra Leone': 'Sierra Leone',
+    'Singapore': 'Singapur', 'Slovakia': 'Slovakya', 'Slovenia': 'Slovenya',
+    'Somalia': 'Somali', 'South Africa': 'Güney Afrika', 'South Korea': 'Güney Kore',
+    'South Sudan': 'Güney Sudan', 'Spain': 'İspanya', 'Sri Lanka': 'Sri Lanka',
+    'Sudan': 'Sudan', 'Sweden': 'İsveç', 'Switzerland': 'İsviçre',
+    'Syria': 'Suriye', 'Taiwan': 'Tayvan', 'Tajikistan': 'Tacikistan',
+    'Tanzania': 'Tanzanya', 'Thailand': 'Tayland', 'Togo': 'Togo',
+    'Tunisia': 'Tunus', 'Turkey': 'Türkiye', 'Turkmenistan': 'Türkmenistan',
+    'Uganda': 'Uganda', 'Ukraine': 'Ukrayna', 'United Arab Emirates': 'BAE',
+    'United Kingdom': 'Birleşik Krallık', 'United States': 'ABD',
+    'United States of America': 'ABD', 'Uruguay': 'Uruguay',
+    'Uzbekistan': 'Özbekistan', 'Venezuela': 'Venezuela', 'Vietnam': 'Vietnam',
+    'W. Sahara': 'Batı Sahra', 'Yemen': 'Yemen', 'Zambia': 'Zambiya',
+    'Zimbabwe': 'Zimbabve', "Côte d'Ivoire": 'Fildişi Sahili',
   };
   private getTurkishName(eng: string): string {
     return this.turkishCountryNames[eng] || eng;
