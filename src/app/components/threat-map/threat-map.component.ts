@@ -277,12 +277,13 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
           d3.select(event.currentTarget).attr('fill', '#1e3a5f').attr('stroke', '#38bdf8').attr('stroke-width', 1.2);
           const name = d.properties.name;
           if (name) {
-            this.hoveredCountry.set(this.getTurkishName(name));
+            const trName = this.getTurkishName(name);
+            this.hoveredCountry.set(trName);
             this.tooltipX.set(event.clientX);
             this.tooltipY.set(event.clientY);
             const attacks = this.threatService.attacks();
-            const source = attacks.filter(a => a.sourceCountry === name).length;
-            const target = attacks.filter(a => a.targetCountry === name).length;
+            const source = attacks.filter(a => a.sourceCountry === trName).length;
+            const target = attacks.filter(a => a.targetCountry === trName).length;
             this.countryStats.set({ source, target });
           }
         }).on('mousemove', (event: any) => {
@@ -294,12 +295,13 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
         }).on('click', (event: any, d: any) => {
           const name = d.properties.name;
           if (name) {
-            this.selectedCountry.set(this.getTurkishName(name));
+            const trName = this.getTurkishName(name);
+            this.selectedCountry.set(trName);
             const attacks = this.threatService.attacks();
-            const source = attacks.filter(a => a.sourceCountry === name).length;
-            const target = attacks.filter(a => a.targetCountry === name).length;
+            const source = attacks.filter(a => a.sourceCountry === trName).length;
+            const target = attacks.filter(a => a.targetCountry === trName).length;
             this.selectedCountryStats.set({ source, target });
-            this.selectedCountryAttacks.set(attacks.filter(a => a.sourceCountry === name || a.targetCountry === name).slice(0, 50));
+            this.selectedCountryAttacks.set(attacks.filter(a => a.sourceCountry === trName || a.targetCountry === trName).slice(0, 50));
           }
         });
       }
