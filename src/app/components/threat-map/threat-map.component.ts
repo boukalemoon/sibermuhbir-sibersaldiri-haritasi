@@ -148,10 +148,6 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
   selectedCountryStats = signal({ source: 0, target: 0 });
   selectedCountryAttacks = signal<Attack[]>([]);
 
-  // Heatmap: ülke adı (Türkçe) → haftalık toplam saldırı
-  private weeklyHeatmap = new Map<string, number>();
-  private weeklyHeatMax = 0;
-
   private turkishCountryNames: Record<string, string> = {
     'Afghanistan': 'Afganistan', 'Albania': 'Arnavutluk', 'Algeria': 'Cezayir',
     'Angola': 'Angola', 'Argentina': 'Arjantin', 'Armenia': 'Ermenistan',
@@ -216,41 +212,11 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
         if (attack.id === this.lastQueuedId) break;
         newAttacks.push(attack);
       }
-      for (const attack of newAttacks) this.queueAttackAnimation(attack);
+      // Her güncelleme döngüsünde en fazla 3 yeni animasyon — yığılmayı önler
+      for (const attack of newAttacks.slice(0, 3)) this.queueAttackAnimation(attack);
       if (attacks[0]) this.lastQueuedId = attacks[0].id;
     });
 
-    // Haftalık stats geldiğinde harita renklerini güncelle
-    effect(() => {
-      const stats = this.threatService.weeklyStats();
-      if (!stats.length || !this.mapReady) return;
-      this.weeklyHeatmap.clear();
-      let max = 0;
-      for (const s of stats) {
-        this.weeklyHeatmap.set(s.country, s.total);
-        if (s.total > max) max = s.total;
-      }
-      this.weeklyHeatMax = max;
-      this.applyHeatmap();
-    });
-  }
-
-  private getHeatFill(trName: string): string {
-    const count = this.weeklyHeatmap.get(trName) || 0;
-    if (!count || this.weeklyHeatMax === 0) return '#050b14';
-    const ratio = Math.log(count + 1) / Math.log(this.weeklyHeatMax + 1);
-    if (ratio < 0.25) return `rgba(60,15,15,${0.4 + ratio})`;
-    if (ratio < 0.5)  return `rgba(130,35,10,${0.45 + ratio * 0.7})`;
-    if (ratio < 0.75) return `rgba(185,55,10,${0.55 + ratio * 0.5})`;
-    return `rgba(220,30,10,${0.7 + ratio * 0.3})`;
-  }
-
-  private applyHeatmap() {
-    if (!this.g) return;
-    this.g.selectAll('path.country').attr('fill', (d: any) => {
-      const trName = this.getTurkishName(d.properties?.name || '');
-      return this.getHeatFill(trName);
-    });
   }
 
   ngOnInit() {
@@ -301,6 +267,9 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
       this.path = d3.geoPath().projection(this.projection);
       this.g.selectAll('path.country').attr('d', this.path);
     }
+    // Projeksiyon değişti — eski koordinatlarla çizilen animasyonlar temizlenir
+    this.activeAttacks = [];
+    this.lastQueuedId = null;
   }
 
   private async loadWorldData() {
@@ -326,9 +295,8 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
         }).on('mousemove', (event: any) => {
           this.tooltipX.set(event.clientX);
           this.tooltipY.set(event.clientY);
-        }).on('mouseleave', (event: any, d: any) => {
-          const trName = this.getTurkishName(d.properties?.name || '');
-          d3.select(event.currentTarget).attr('fill', this.getHeatFill(trName)).attr('stroke', '#2dd4bf').attr('stroke-width', 0.5);
+        }).on('mouseleave', (event: any) => {
+          d3.select(event.currentTarget).attr('fill', '#050b14').attr('stroke', '#2dd4bf').attr('stroke-width', 0.5);
           this.hoveredCountry.set(null);
         }).on('click', (event: any, d: any) => {
           const name = d.properties.name;
@@ -366,7 +334,7 @@ export class ThreatMapComponent implements OnInit, OnDestroy {
     const nx = -dy / dr, ny = dx / dr;
     const ctrl = [mid[0] + nx * dr * 0.3, mid[1] + ny * dr * 0.3];
     this.activeAttacks.push({ attack, startTime: Date.now(), duration: 1500, sourcePos: src, targetPos: tgt, controlPos: ctrl });
-    if (this.activeAttacks.length > 300) this.activeAttacks.shift();
+    if (this.activeAttacks.length > 120) this.activeAttacks.shift();
   }
 
   private startCanvasLoop() {

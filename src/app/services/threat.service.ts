@@ -290,7 +290,7 @@ export class ThreatService implements OnDestroy {
         const newAttack = this.generateAttack();
         this.attacks.update(attacks => {
           const updated = [newAttack, ...attacks];
-          if (updated.length > 500) updated.length = 500;
+          if (updated.length > 200) updated.length = 200;
           return updated;
         });
         count++;
@@ -301,7 +301,7 @@ export class ThreatService implements OnDestroy {
           const newAttack = this.generateAttack();
           this.attacks.update(attacks => {
             const updated = [newAttack, ...attacks];
-            if (updated.length > 500) updated.length = 500;
+            if (updated.length > 200) updated.length = 200;
             return updated;
           });
           // 10'da 1 örnekleme ile log buffer'a ekle
