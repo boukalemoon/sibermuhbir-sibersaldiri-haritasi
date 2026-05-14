@@ -59,6 +59,10 @@ export class App implements OnInit, OnDestroy {
     el.style.cursor = 'grab';
     el.style.userSelect = '';
   }
+  onNewsWheel(e: WheelEvent, el: HTMLElement) {
+    e.preventDefault();
+    el.scrollLeft += e.deltaY * 2.5;
+  }
 
   attackRate = this.threatService.attackRate;
   threatLevel = this.threatService.threatLevel;

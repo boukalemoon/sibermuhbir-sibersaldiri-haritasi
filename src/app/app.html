@@ -155,7 +155,8 @@
            (mousedown)="onDragStart($event, newsScroll)"
            (mousemove)="onDragMove($event, newsScroll)"
            (mouseup)="onDragEnd(newsScroll)"
-           (mouseleave)="onDragEnd(newsScroll)">
+           (mouseleave)="onDragEnd(newsScroll)"
+           (wheel)="onNewsWheel($event, newsScroll)">
         <div class="flex h-full" style="width:max-content;">
           @for (item of news(); track item.link; let i = $index) {
             <a [href]="item.link" target="_blank" rel="noopener"
