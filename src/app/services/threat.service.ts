@@ -1,6 +1,5 @@
-import { Inject, PLATFORM_ID } from '@angular/core';
+import { PLATFORM_ID, Injectable, signal, computed, OnDestroy, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Injectable, signal, computed, OnDestroy } from '@angular/core';
 
 
 export interface Attack {
@@ -151,11 +150,12 @@ export class ThreatService implements OnDestroy {
   totalCount = computed(() => this.attacks().length);
   allAttackTypes = ATTACK_TYPES;
 
+  private platformId = inject(PLATFORM_ID);
   private totalWeight = COUNTRIES.reduce((sum, c) => sum + c.weight, 0);
-  private pollingInterval: any;     // setInterval için
-  private simulationTimeout: any;   // setTimeout için
+  private pollingInterval: any;
+  private simulationTimeout: any;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: any) {
+  constructor() {
     if (isPlatformBrowser(this.platformId)) {
       this.fetchRealData();
       this.startPolling();
