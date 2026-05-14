@@ -1,78 +1,72 @@
 <main class="w-screen h-screen bg-[#060b14] text-slate-200 overflow-hidden font-sans relative flex flex-col">
 
-  <!-- Header -->
-  <header class="h-14 shrink-0 z-20 flex items-center justify-between px-5 gap-4"
-          style="background: rgba(6,11,20,0.97); border-bottom: 1px solid rgba(51,65,85,0.4); box-shadow: 0 1px 24px rgba(0,0,0,0.6);">
+  <!-- ── HEADER ── -->
+  <header class="h-12 md:h-14 shrink-0 z-20 flex items-center justify-between px-3 md:px-5 gap-2 md:gap-4"
+          style="background:rgba(6,11,20,0.97);border-bottom:1px solid rgba(51,65,85,0.4);box-shadow:0 1px 24px rgba(0,0,0,0.6);">
 
-    <!-- Left: Brand -->
-    <div class="flex items-center gap-4 min-w-0">
-      <div class="flex items-center gap-2.5 shrink-0">
-        <div class="relative flex h-3 w-3">
+    <!-- Left: Brand + Stats -->
+    <div class="flex items-center gap-2 md:gap-4 min-w-0">
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="relative flex h-2.5 w-2.5">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-60"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500" style="box-shadow:0 0 10px #ef4444;"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" style="box-shadow:0 0 8px #ef4444;"></span>
         </div>
-        <h1 class="text-sm font-bold tracking-[0.25em] uppercase text-slate-100 whitespace-nowrap">
-          <span style="color:#60a5fa;">SİBER MUHBİR</span> SALDIRI HARİTASI
+        <h1 class="text-xs md:text-sm font-bold tracking-[0.2em] uppercase text-slate-100 whitespace-nowrap">
+          <span style="color:#60a5fa;">SİBER MUHBİR</span>
+          <span class="hidden sm:inline"> SALDIRI HARİTASI</span>
         </h1>
       </div>
-
-      <!-- Threat Level Badge -->
-      <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider shrink-0"
+      <div class="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider shrink-0"
            [style.background]="threatLevelConfig[threatLevel()].bg"
            [style.border]="'1px solid ' + threatLevelConfig[threatLevel()].border"
            [style.color]="threatLevelConfig[threatLevel()].color">
-        <span class="w-1.5 h-1.5 rounded-full animate-pulse"
-              [style.background]="threatLevelConfig[threatLevel()].color"></span>
+        <span class="w-1.5 h-1.5 rounded-full animate-pulse" [style.background]="threatLevelConfig[threatLevel()].color"></span>
         TEHDİT: {{ threatLevel() }}
       </div>
-
-      <!-- Attack Rate -->
-      <div class="hidden md:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 shrink-0">
+      <div class="hidden lg:flex items-center gap-1.5 text-[10px] font-mono text-slate-500 shrink-0">
         <span class="text-slate-300 font-bold">{{ attackRate() }}</span> saldırı/dak
       </div>
     </div>
 
-    <!-- Right: Buttons & Clock -->
-    <div class="flex items-center gap-3 shrink-0 text-[10px] font-mono">
-
-      <!-- Haber Button -->
-      <button (click)="newsOpen.set(true)"
-              class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider transition-all duration-200 shrink-0"
-              style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); color:#34d399;">
+    <!-- Right: Buttons + Clock -->
+    <div class="flex items-center gap-1.5 md:gap-3 shrink-0 text-[10px] font-mono">
+      <!-- HABER -->
+      <button (click)="newsOpen.set(!newsOpen())"
+              class="flex items-center gap-1 md:gap-1.5 px-2 md:px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider transition-all duration-200 shrink-0"
+              [style]="newsOpen()
+                ? 'background:rgba(16,185,129,0.25);border:1px solid rgba(16,185,129,0.6);color:#34d399;'
+                : 'background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:#34d399;'">
         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
         HABER
       </button>
-
-      <!-- Map Toggle Button -->
+      <!-- HARİTA (desktop) -->
       <button (click)="toggleMap()"
-              class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider transition-all duration-200 shrink-0"
+              class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider transition-all duration-200 shrink-0"
               [style]="mapVisible()
-                ? 'background:rgba(37,99,235,0.15); border:1px solid rgba(59,130,246,0.4); color:#60a5fa;'
-                : 'background:rgba(75,85,99,0.15); border:1px solid rgba(107,114,128,0.4); color:#9ca3af;'">
-        <span class="w-1.5 h-1.5 rounded-full"
-              [style.background]="mapVisible() ? '#60a5fa' : '#6b7280'"></span>
+                ? 'background:rgba(37,99,235,0.15);border:1px solid rgba(59,130,246,0.4);color:#60a5fa;'
+                : 'background:rgba(75,85,99,0.15);border:1px solid rgba(107,114,128,0.4);color:#9ca3af;'">
+        <span class="w-1.5 h-1.5 rounded-full" [style.background]="mapVisible() ? '#60a5fa' : '#6b7280'"></span>
         {{ mapVisible() ? 'HARİTA: AÇIK' : 'HARİTA: KAPALI' }}
       </button>
-
-      <div class="hidden md:flex items-center gap-1.5 text-slate-400">
+      <div class="hidden lg:flex items-center gap-1.5 text-slate-400">
         <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full" style="box-shadow:0 0 6px #10b981;"></span>
         SİSTEM AKTİF
       </div>
-      <div class="hidden md:flex items-center gap-1.5 text-slate-400">
+      <div class="hidden lg:flex items-center gap-1.5 text-slate-400">
         <span class="w-1.5 h-1.5 bg-blue-500 rounded-full" style="box-shadow:0 0 6px #3b82f6;"></span>
         SAVUNMA AKTİF
       </div>
-      <div class="text-slate-400 font-bold border-l border-slate-700/60 pl-4">
+      <div class="hidden sm:flex text-slate-400 font-bold border-l border-slate-700/60 pl-3">
         {{ currentTime() }}
       </div>
     </div>
   </header>
 
-  <!-- Ticker Bar -->
+  <!-- ── TICKER BAR ── -->
   <div class="shrink-0 h-7 flex items-center overflow-hidden z-20"
-       style="background:rgba(4,8,16,0.95); border-bottom:1px solid rgba(16,185,129,0.2);">
-    <div class="shrink-0 flex items-center gap-2 px-3 h-full z-10"
-         style="background:rgba(16,185,129,0.15); border-right:1px solid rgba(16,185,129,0.3);">
+       style="background:rgba(4,8,16,0.95);border-bottom:1px solid rgba(16,185,129,0.2);">
+    <div class="shrink-0 flex items-center gap-2 px-3 h-full"
+         style="background:rgba(16,185,129,0.12);border-right:1px solid rgba(16,185,129,0.25);">
       <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
       <span class="text-[9px] font-black text-emerald-400 tracking-widest uppercase whitespace-nowrap">SON DAKİKA</span>
     </div>
@@ -81,26 +75,24 @@
     </div>
   </div>
 
-  <!-- Main Content -->
+  <!-- ── MAIN CONTENT ── -->
   <div class="flex-1 relative overflow-hidden">
 
-    <!-- Map Background -->
+    <!-- Map -->
     @if (mapVisible()) {
-    <div class="absolute inset-0 z-0">
-      <app-threat-map></app-threat-map>
-    </div>
+      <div class="absolute inset-0 z-0"><app-threat-map></app-threat-map></div>
     } @else {
-    <div class="absolute inset-0 z-0 flex items-center justify-center"
-         style="background:radial-gradient(ellipse at center, rgba(15,23,42,0.8) 0%, #060b14 100%);">
-      <div class="text-center text-slate-600">
-        <div class="text-4xl mb-3">⬛</div>
-        <div class="text-xs font-mono tracking-widest uppercase">Harita Kapalı</div>
+      <div class="absolute inset-0 z-0 flex items-center justify-center"
+           style="background:radial-gradient(ellipse at center,rgba(15,23,42,0.8) 0%,#060b14 100%);">
+        <div class="text-center text-slate-600">
+          <div class="text-3xl mb-2">⬛</div>
+          <div class="text-xs font-mono tracking-widest uppercase">Harita Kapalı</div>
+        </div>
       </div>
-    </div>
     }
 
-    <!-- Overlay Panels -->
-    <div class="absolute inset-0 z-10 pointer-events-none p-3 flex justify-between gap-3">
+    <!-- Desktop Overlay Panels -->
+    <div class="hidden md:flex absolute inset-0 z-10 pointer-events-none p-3 justify-between gap-3">
       <div class="w-72 h-full pointer-events-auto flex flex-col gap-3">
         <app-threat-stats></app-threat-stats>
       </div>
@@ -109,56 +101,79 @@
       </div>
     </div>
 
-    <!-- News Bottom Panel -->
+    <!-- Mobile Stats Bottom Sheet -->
+    <div class="md:hidden absolute bottom-0 left-0 right-0 z-30 mobile-sheet"
+         [class.mobile-sheet-open]="mobilePanel() === 'stats'"
+         style="height:70vh;background:rgba(6,11,20,0.98);border-top:1px solid rgba(51,65,85,0.5);">
+      <div class="flex items-center justify-between px-4 py-2 border-b border-slate-800/60">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">İstatistikler</span>
+        <button (click)="mobilePanel.set('none')" class="text-slate-500 hover:text-slate-200 text-sm">✕</button>
+      </div>
+      <div class="h-full overflow-y-auto p-3 pb-16"><app-threat-stats></app-threat-stats></div>
+    </div>
+
+    <!-- Mobile Log Bottom Sheet -->
+    <div class="md:hidden absolute bottom-0 left-0 right-0 z-30 mobile-sheet"
+         [class.mobile-sheet-open]="mobilePanel() === 'log'"
+         style="height:70vh;background:rgba(6,11,20,0.98);border-top:1px solid rgba(51,65,85,0.5);">
+      <div class="flex items-center justify-between px-4 py-2 border-b border-slate-800/60">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Tehdit Günlüğü</span>
+        <button (click)="mobilePanel.set('none')" class="text-slate-500 hover:text-slate-200 text-sm">✕</button>
+      </div>
+      <div class="h-full overflow-y-auto p-3 pb-16"><app-threat-log></app-threat-log></div>
+    </div>
+
+    <!-- ── NEWS BOTTOM PANEL ── -->
     <div class="absolute bottom-0 left-0 right-0 z-40 news-panel-slide"
          [class.news-panel-open]="newsOpen()"
          style="height:300px;">
 
       <!-- Panel Header -->
-      <div class="flex items-center justify-between px-4 py-2 shrink-0"
-           style="background:rgba(4,10,20,0.98); border-top:1px solid rgba(16,185,129,0.4); border-bottom:1px solid rgba(30,41,59,0.6);">
-        <div class="flex items-center gap-3">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-[11px] font-black text-emerald-400 uppercase tracking-widest">Siber Güvenlik Haberleri</span>
-          <span class="text-[10px] font-mono text-slate-600">{{ news().length }} kaynak haberi</span>
+      <div class="flex items-center justify-between px-3 md:px-4 py-2 shrink-0"
+           style="background:rgba(4,10,20,0.98);border-top:1px solid rgba(16,185,129,0.4);border-bottom:1px solid rgba(30,41,59,0.6);">
+        <div class="flex items-center gap-2 md:gap-3 min-w-0">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+          <span class="text-[10px] md:text-[11px] font-black text-emerald-400 uppercase tracking-widest whitespace-nowrap">Siber Güvenlik Haberleri</span>
+          <span class="hidden sm:inline text-[10px] font-mono text-slate-600">{{ news().length }} haber</span>
         </div>
-        <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2 text-[9px] font-mono text-slate-600">
+        <div class="flex items-center gap-2">
+          <div class="hidden md:flex items-center gap-1.5 text-[9px] font-mono">
             @for (src of newsSources(); track src) {
               <span class="px-1.5 py-0.5 rounded"
-                    style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#6ee7b7;">{{ src }}</span>
+                    style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:#6ee7b7;">{{ src }}</span>
             }
           </div>
+          <span class="hidden sm:inline text-[9px] text-slate-600 font-mono">← sürükle →</span>
           <button (click)="newsOpen.set(false)"
-                  class="w-6 h-6 flex items-center justify-center rounded text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-all text-xs">✕</button>
+                  class="w-6 h-6 flex items-center justify-center rounded text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-all text-xs ml-1">✕</button>
         </div>
       </div>
 
-      <!-- News Grid -->
-      <div class="flex-1 overflow-x-auto overflow-y-hidden news-scroll-x"
-           style="background:rgba(4,8,16,0.97); height:calc(300px - 37px);">
-        <div class="flex gap-0 h-full" style="width:max-content;">
+      <!-- News Cards (drag-to-scroll) -->
+      <div #newsScroll class="news-scroll-x"
+           style="background:rgba(4,8,16,0.97);height:calc(300px - 37px);overflow-x:auto;overflow-y:hidden;cursor:grab;"
+           (mousedown)="onDragStart($event, newsScroll)"
+           (mousemove)="onDragMove($event, newsScroll)"
+           (mouseup)="onDragEnd(newsScroll)"
+           (mouseleave)="onDragEnd(newsScroll)">
+        <div class="flex h-full" style="width:max-content;">
           @for (item of news(); track item.link; let i = $index) {
             <a [href]="item.link" target="_blank" rel="noopener"
-               class="news-card flex flex-col justify-between h-full cursor-pointer"
-               style="width:280px; padding:12px 14px; border-right:1px solid rgba(30,41,59,0.5);">
-              <!-- Source + Time -->
-              <div class="flex items-center justify-between mb-2 shrink-0">
-                <span class="text-[9px] font-black uppercase tracking-widest"
+               class="news-card flex flex-col justify-between h-full"
+               style="width:260px;padding:10px 14px;border-right:1px solid rgba(30,41,59,0.5);"
+               (mousedown)="$event.preventDefault()">
+              <div class="flex items-center justify-between mb-1.5 shrink-0">
+                <span class="text-[9px] font-black uppercase tracking-widest truncate pr-2"
                       style="color:#6ee7b7;">{{ item.source || 'HABER' }}</span>
-                <span class="text-[9px] font-mono text-slate-600">
-                  {{ item.pubDate | date:'dd MMM, HH:mm' }}
-                </span>
+                <span class="text-[9px] font-mono text-slate-600 shrink-0">{{ item.pubDate | date:'dd MMM, HH:mm' }}</span>
               </div>
-              <!-- Headline -->
               <div class="flex-1 overflow-hidden">
-                <div class="text-[11px] font-semibold text-slate-200 leading-snug line-clamp-3 mb-2">{{ item.title }}</div>
+                <div class="text-[11px] font-semibold text-slate-200 leading-snug line-clamp-3 mb-1.5">{{ item.title }}</div>
                 @if (item.contentSnippet) {
                   <div class="text-[10px] text-slate-600 leading-relaxed line-clamp-2">{{ item.contentSnippet }}</div>
                 }
               </div>
-              <!-- Link -->
-              <div class="shrink-0 mt-2 text-[9px] font-mono text-slate-700 flex items-center gap-1">
+              <div class="shrink-0 mt-1.5 text-[9px] font-mono text-slate-700">
                 <span style="color:rgba(16,185,129,0.5);">↗</span> Habere git
               </div>
             </a>
@@ -173,6 +188,43 @@
 
     </div>
 
+  </div>
+
+  <!-- ── MOBİL BOTTOM TAB BAR ── -->
+  <div class="md:hidden shrink-0 flex z-50"
+       style="background:rgba(6,11,20,0.98);border-top:1px solid rgba(51,65,85,0.4);height:52px;">
+    <button class="flex-1 flex flex-col items-center justify-center gap-0.5 transition-all"
+            (click)="toggleMobilePanel('stats')"
+            [style.color]="mobilePanel() === 'stats' ? '#60a5fa' : '#475569'">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+      <span class="text-[8px] font-bold uppercase tracking-wider">İSTATİSTİK</span>
+    </button>
+    <button class="flex-1 flex flex-col items-center justify-center gap-0.5 transition-all"
+            (click)="toggleMobilePanel('log')"
+            [style.color]="mobilePanel() === 'log' ? '#60a5fa' : '#475569'">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+      </svg>
+      <span class="text-[8px] font-bold uppercase tracking-wider">GÜNLÜK</span>
+    </button>
+    <button class="flex-1 flex flex-col items-center justify-center gap-0.5 transition-all"
+            (click)="newsOpen.set(!newsOpen())"
+            [style.color]="newsOpen() ? '#34d399' : '#475569'">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+      </svg>
+      <span class="text-[8px] font-bold uppercase tracking-wider">HABER</span>
+    </button>
+    <button class="flex-1 flex flex-col items-center justify-center gap-0.5 transition-all"
+            (click)="toggleMap()"
+            [style.color]="mapVisible() ? '#60a5fa' : '#475569'">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+      </svg>
+      <span class="text-[8px] font-bold uppercase tracking-wider">HARİTA</span>
+    </button>
   </div>
 
 </main>

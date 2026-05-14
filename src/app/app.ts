@@ -22,6 +22,7 @@ export class App implements OnInit, OnDestroy {
   currentTime = signal('--:--:-- UTC');
   mapVisible = signal(true);
   newsOpen = signal(false);
+  mobilePanel = signal<'none' | 'stats' | 'log'>('none');
 
   news = this.newsService.news;
   newsSources = computed(() => {
@@ -34,8 +35,29 @@ export class App implements OnInit, OnDestroy {
     return items.map(n => n.title).join('   ◆   ');
   });
 
-  toggleMap() {
-    this.mapVisible.update(v => !v);
+  toggleMap() { this.mapVisible.update(v => !v); }
+  toggleMobilePanel(p: 'stats' | 'log') {
+    this.mobilePanel.update(cur => cur === p ? 'none' : p);
+  }
+
+  // Drag-to-scroll for news panel
+  private dragState = { active: false, startX: 0, scrollLeft: 0 };
+
+  onDragStart(e: MouseEvent, el: HTMLElement) {
+    this.dragState = { active: true, startX: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft };
+    el.style.cursor = 'grabbing';
+    el.style.userSelect = 'none';
+  }
+  onDragMove(e: MouseEvent, el: HTMLElement) {
+    if (!this.dragState.active) return;
+    e.preventDefault();
+    const x = e.pageX - el.offsetLeft;
+    el.scrollLeft = this.dragState.scrollLeft - (x - this.dragState.startX) * 1.5;
+  }
+  onDragEnd(el: HTMLElement) {
+    this.dragState.active = false;
+    el.style.cursor = 'grab';
+    el.style.userSelect = '';
   }
 
   attackRate = this.threatService.attackRate;
@@ -50,17 +72,11 @@ export class App implements OnInit, OnDestroy {
   };
 
   ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.startClock();
-    }
+    if (isPlatformBrowser(this.platformId)) this.startClock();
   }
-
   ngOnDestroy() {
-    if (this.clockInterval) {
-      clearInterval(this.clockInterval);
-    }
+    if (this.clockInterval) clearInterval(this.clockInterval);
   }
-
   private startClock() {
     const update = () => {
       const now = new Date();
