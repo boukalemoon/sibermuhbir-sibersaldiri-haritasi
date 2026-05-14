@@ -7,6 +7,7 @@ export interface NewsItem {
     link: string;
     pubDate: string;
     contentSnippet: string;
+    source?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -31,7 +32,7 @@ export class NewsService {
             }
             const res = await fetch(apiUrl);
             const data = await res.json();
-            this.news.set(data.slice(0, 10));
+            this.news.set(data.slice(0, 20));
         } catch (err) {
             console.error('Haber alınamadı', err);
         }

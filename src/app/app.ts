@@ -1,24 +1,34 @@
-import {ChangeDetectionStrategy, Component, OnInit, OnDestroy, PLATFORM_ID, inject, signal} from '@angular/core';
-import {isPlatformBrowser} from '@angular/common';
+import {ChangeDetectionStrategy, Component, OnInit, OnDestroy, PLATFORM_ID, inject, signal, computed} from '@angular/core';
+import {isPlatformBrowser, DatePipe} from '@angular/common';
 import {ThreatMapComponent} from './components/threat-map/threat-map.component';
 import {ThreatLogComponent} from './components/threat-log/threat-log.component';
 import {ThreatStatsComponent} from './components/threat-stats/threat-stats.component';
 import {ThreatService} from './services/threat.service';
+import {NewsService} from './services/news.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
-  imports: [ThreatMapComponent, ThreatLogComponent, ThreatStatsComponent],
+  imports: [ThreatMapComponent, ThreatLogComponent, ThreatStatsComponent, DatePipe],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
 export class App implements OnInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private threatService = inject(ThreatService);
+  private newsService = inject(NewsService);
   private clockInterval: ReturnType<typeof setInterval> | null = null;
 
   currentTime = signal('--:--:-- UTC');
   mapVisible = signal(true);
+  newsOpen = signal(false);
+
+  news = this.newsService.news;
+  tickerText = computed(() => {
+    const items = this.newsService.news();
+    if (!items.length) return 'Siber güvenlik haberleri yükleniyor...';
+    return items.map(n => n.title).join('   ◆   ');
+  });
 
   toggleMap() {
     this.mapVisible.update(v => !v);

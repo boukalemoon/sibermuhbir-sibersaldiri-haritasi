@@ -4,12 +4,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { ThreatService, Attack } from '../../services/threat.service';
 import * as d3 from 'd3';
 import * as topojson from 'topojson-client';
-import { NewsPanelComponent } from '../news-panel/news-panel.component';
-
 @Component({
   selector: 'app-threat-map',
   standalone: true,
-  imports: [DatePipe, MatIconModule, NewsPanelComponent],
+  imports: [DatePipe, MatIconModule],
   template: `
     <div class="w-full h-full relative overflow-hidden" style="background:#060b14;">
       <div class="absolute inset-0 z-0 pointer-events-none"
@@ -105,7 +103,6 @@ import { NewsPanelComponent } from '../news-panel/news-panel.component';
           </div>
         </div>
       }
-      <app-news-panel />
     </div>
   `,
   styles: [`

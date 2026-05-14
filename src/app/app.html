@@ -32,8 +32,17 @@
       </div>
     </div>
 
-    <!-- Right: Status & Clock -->
-    <div class="flex items-center gap-5 shrink-0 text-[10px] font-mono">
+    <!-- Right: Buttons & Clock -->
+    <div class="flex items-center gap-3 shrink-0 text-[10px] font-mono">
+
+      <!-- Haber Button -->
+      <button (click)="newsOpen.set(true)"
+              class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider transition-all duration-200 shrink-0"
+              style="background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.4); color:#34d399;">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        HABER
+      </button>
+
       <!-- Map Toggle Button -->
       <button (click)="toggleMap()"
               class="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider transition-all duration-200 shrink-0"
@@ -44,6 +53,7 @@
               [style.background]="mapVisible() ? '#60a5fa' : '#6b7280'"></span>
         {{ mapVisible() ? 'HARİTA: AÇIK' : 'HARİTA: KAPALI' }}
       </button>
+
       <div class="hidden md:flex items-center gap-1.5 text-slate-400">
         <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full" style="box-shadow:0 0 6px #10b981;"></span>
         SİSTEM AKTİF
@@ -52,11 +62,24 @@
         <span class="w-1.5 h-1.5 bg-blue-500 rounded-full" style="box-shadow:0 0 6px #3b82f6;"></span>
         SAVUNMA AKTİF
       </div>
-      <div class="text-slate-400 font-bold border-l border-slate-700/60 pl-5">
+      <div class="text-slate-400 font-bold border-l border-slate-700/60 pl-4">
         {{ currentTime() }}
       </div>
     </div>
   </header>
+
+  <!-- Ticker Bar -->
+  <div class="shrink-0 h-7 flex items-center overflow-hidden z-20"
+       style="background:rgba(4,8,16,0.95); border-bottom:1px solid rgba(16,185,129,0.2);">
+    <div class="shrink-0 flex items-center gap-2 px-3 h-full z-10"
+         style="background:rgba(16,185,129,0.15); border-right:1px solid rgba(16,185,129,0.3);">
+      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+      <span class="text-[9px] font-black text-emerald-400 tracking-widest uppercase whitespace-nowrap">SON DAKİKA</span>
+    </div>
+    <div class="flex-1 overflow-hidden relative h-full flex items-center">
+      <span class="ticker-text text-[10px] text-slate-400 font-mono">{{ tickerText() }}</span>
+    </div>
+  </div>
 
   <!-- Main Content -->
   <div class="flex-1 relative overflow-hidden">
@@ -87,4 +110,68 @@
     </div>
 
   </div>
+
+  <!-- News Modal -->
+  @if (newsOpen()) {
+  <div class="absolute inset-0 z-50 flex items-center justify-center p-4"
+       style="background:rgba(0,0,0,0.75); backdrop-filter:blur(4px);"
+       (click)="newsOpen.set(false)">
+    <div class="w-full max-w-2xl max-h-[85vh] flex flex-col rounded-xl overflow-hidden"
+         style="background:rgba(6,11,20,0.98); border:1px solid rgba(16,185,129,0.3); box-shadow:0 24px 60px rgba(0,0,0,0.8);"
+         (click)="$event.stopPropagation()">
+
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 flex justify-between items-center shrink-0"
+           style="border-bottom:1px solid rgba(51,65,85,0.5); background:rgba(10,15,30,0.8);">
+        <div class="flex items-center gap-2.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h2 class="text-sm font-bold text-slate-100 uppercase tracking-wider">Siber Güvenlik Haberleri</h2>
+          <span class="text-[10px] font-mono text-slate-500 ml-1">{{ news().length }} haber</span>
+        </div>
+        <button (click)="newsOpen.set(false)"
+                class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-all text-sm">✕</button>
+      </div>
+
+      <!-- News List -->
+      <div class="flex-1 overflow-y-auto news-scroll">
+        @for (item of news(); track item.link; let i = $index) {
+          <a [href]="item.link" target="_blank" rel="noopener"
+             class="block px-5 py-3.5 transition-all duration-150 cursor-pointer"
+             style="border-bottom:1px solid rgba(30,41,59,0.6);"
+             [style.background]="'transparent'"
+             onmouseenter="this.style.background='rgba(16,185,129,0.05)'"
+             onmouseleave="this.style.background='transparent'">
+            <div class="flex items-start gap-3">
+              <span class="shrink-0 mt-0.5 text-[10px] font-mono font-bold w-5 text-center"
+                    style="color:rgba(16,185,129,0.5);">{{ i + 1 }}</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-[12px] font-semibold text-slate-200 leading-snug mb-1.5">{{ item.title }}</div>
+                @if (item.contentSnippet) {
+                  <div class="text-[11px] text-slate-500 leading-relaxed line-clamp-2 mb-1.5">{{ item.contentSnippet }}</div>
+                }
+                <div class="flex items-center gap-3 text-[10px] font-mono text-slate-600">
+                  @if (item.source) {
+                    <span class="text-emerald-600">{{ item.source }}</span>
+                  }
+                  @if (item.pubDate) {
+                    <span>{{ item.pubDate | date:'dd MMM yyyy, HH:mm' }}</span>
+                  }
+                  <span class="text-slate-700 ml-auto">↗ Habere git</span>
+                </div>
+              </div>
+            </div>
+          </a>
+        }
+        @if (news().length === 0) {
+          <div class="flex flex-col items-center justify-center py-16 text-slate-600">
+            <div class="text-3xl mb-3">📡</div>
+            <div class="text-xs font-mono tracking-wider">Haberler yükleniyor...</div>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+  }
+
 </main>
