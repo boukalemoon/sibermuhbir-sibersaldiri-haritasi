@@ -18,6 +18,11 @@ export class App implements OnInit, OnDestroy {
   private clockInterval: ReturnType<typeof setInterval> | null = null;
 
   currentTime = signal('--:--:-- UTC');
+  mapVisible = signal(true);
+
+  toggleMap() {
+    this.mapVisible.update(v => !v);
+  }
 
   attackRate = this.threatService.attackRate;
   threatLevel = this.threatService.threatLevel;
